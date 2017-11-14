@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+
+    <meta http-equiv="content-type" content="text/html" charset="utf-8" />
+    <meta http-equiv="refresh" content="600" />
+    {%  block title  %}<title>ThinkSpatial - Hauptseite</title> {% endblock %}
+    {% load static %}
+    <link rel="shortcut icon" type="image/x-icon" href="{% static "/static/images/favicon.ico" %}" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+          integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+          crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"
+            integrity="sha512-lInM/apFSqyy1o6s89K4iQUKg6ppXEgsVxT35HbzUupEVRh2Eu9Wdl4tHj7dZO0s1uvplcYGmt3498TtHq+log=="
+            crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.js"></script>
+    <link rel="stylesheet" href="{% static "css/leaflet/MarkerCluster.css" %}" />
+    <link rel="stylesheet" href="{% static "css/leaflet/MarkerCluster.Default.css" %}" />
+    <script src="{% static "js/leaflet/leaflet.markercluster-src.js" %}" ></script>
+    <script src="{% static "js/leaflet/leaflet.wms.js" %}"></script>
+    <script src="{% static "js/leaflet/leaflet.wmslegend.js" %}"></script>
+    <script src="{% static "js/leaflet/leaflet.heat.js" %}"></script>
+    <!-- <script src="http://matchingnotes.com/javascripts/leaflet-google.js"></script> -->
+    <!-- <script src="https://maps.google.com/maps/api/js?v=3&key=AIzaSyBYAAaQrIokFeyfkBVk87UEGD9MyFIp5rw"></script> -->
+    <!-- Add jQuery library -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Add fancyBox -->
+    <link rel="stylesheet" href="{% static "css/fancybox/jquery.fancybox.css" %}" type="text/css" media="screen" />
+    <script type="text/javascript" src="{%  static "js/fancybox/jquery.fancybox.pack.js" %}"></script>
+    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/themes/base/jquery-ui.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="http://thinkspatial.boku.ac.at/app/style.php" />
+    <link rel="stylesheet" type="text/css" href="http://thinkspatial.boku.ac.at/app/style_dropdown.php" />
+    <link rel="stylesheet" type="text/css" href="{%  static "css/thinkspatial.css" %}" />
+    <script src="{% static "js/leaflet/tile.stamen.js" %}"></script>
+    <script type="text/javascript" src="{%  static "js/thinkspatial.js" %}"></script>
+
+</head>
+
+<body>
+
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/de_DE/all.js#xfbml=1";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div style="height:90%">
+
+    {% include "header.html" %}
+
+    <!-- ######################################## NAVIGATION ###################################### -->
+    <div class="no-print" style="height:46px;background-color:#F4FCFF;">
+        <table cellpadding="0" cellspacing="0" style=" vertical-align:middle;width:100%;border:0px;">
+            <tr>
+
+                <td>
+                    <nav>
+                        <ul>
+                            <li class = "cat1">
+                                <a href="#"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/info.svg" /></a>
+                                <ul>
+                                    <li><a href="../ern2017.php"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/projects.svg" /> Projektbeispiele</a></li>
+                                    <li><a href="info.php" alt="Information zu youth.places" title="Information zu youth.places">Information zum Projekt</a></li>
+                                    <li><a href="disclaimer.php"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/copyright.svg" /> Disclaimer und Lizenzen</a></li>
+                                </ul>
+                            </li>
+                            <li class = "cat2">
+                                <a href="https://thinkspatial.boku.ac.at/app/geoloc.php" title="Aktuellen Standort erfassen">
+                                    <img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/pin.svg" />
+                                </a>
+                            </li>
+
+                            <li class = "cat5">
+                                <a href="#"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/layers.svg" alt="Meine Projekte" title="Meine Projekte" /></a>
+                                <ul>
+                                    <li><a href='index.php?init=1&action=extent&auth=FVWXWXV3Z4HSBHXRGDSE'>Think Spatial!</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=HCPXWYV2Z4KSBHXFGDTQ'>Korneuburg 2036</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=Z6VV1X7G84BSIDF2FVNP'>youth.places</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=BLIK81ISSNNNXLPWLR88'>Raumnutzung</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=XQ5ECD6W6AQ8EBM23XXW'>HOT SPOTS Josefstadt</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=3EQTS5LPDVNB918FBZZT'>Visionen für Wien</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=8QZ2V9IBCARNKQ5AN9ND'>TransWind</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=T4K8WA4PUXFQ5WAGZF3T'>Visionen für Wien</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=IQWC4R9P5PSZIKM85421'>Transforming Spaces</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=3DFZQV57VZ3LISTFX36L'>ILEN research map</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=KUHXQF2SL857ZAWX7DPL'>Transforming Mood</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=E47RBTKNU1RDCPM73YMN'>Natur vor der Haustür</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=2DD1AD58HCQA77LLY7HY'></a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=RI4B9H7U8VINF42MULCV'>AktiveOrte</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=E6SI6GZ7GLZX2KLTM1SR'>AktiveWege</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=Y5K99TCN29LTL7UM13AW'>Un/Sicher-Unsicherheit</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=MNR3EX9KICBZERC3DQAA'>Un/Sicher-Unsicherheit</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=2M3RLNK1HQLCFM6RZYL4'>ThinkSpatial! Themen</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=ASZ5HRMPYNKTG8N1YL5W'>Lehmbau im Weinviertel</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=F5MMHPLN5WLWYIHXL2WG'>Testprojekt</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=L6XZUIP2CBP8NKDXKFFN'>Freiraum und Gesundheit</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=PD4QLDTP287VXXT8ILX8'>Citizen Science Methoden</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=51X2KSBPFZN41FP5STYL'>3B Geschichte</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=T8R2VX2YKHCUAZ5F8ND2'>Anglizismen: Makes your day?</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=WN6RYYBDW623N15B3VCP'>1984:Kameras</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=XSV3T7ZXP5L6PTRZ9TH5'>Floridsdorf</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=ATPKIIQWNUVVFQ7PKTHR'>Sagen aus Wien</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=YD72BEDLKHPKMSUAWVUQ'>Sagen aus Wien</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=84K639PAZNNK5WXD5DIX'>ThinkSpatial!@ERN</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=UAZT2YLLSBAXR4HWII5S'>Hollabrunn</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=MW159L769AFI22YI4L32'>Think Spatial! Demo</a></li>
+                                    <li><a href='index.php?init=1&action=extent&auth=1RTLB4VZCHW9MXZQ4Q8I'>TEST</a></li>
+                                </ul>
+                            </li>
+
+                            <li class = "cat2">
+                                <a href="#"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/map.svg" alt="Kartenansichten" title="Kartenansichten" /></a>
+                                <ul>
+
+                                    <li><a class="nav_pulldown" href="index.php?mode=font_symbols&auth=Z6VV1X7G84BSIDF2FVNP" title="">Raumtypen</a></li>
+                                    <li><a class="nav_pulldown"  href="index.php?mode=colors_gd&auth=Z6VV1X7G84BSIDF2FVNP" title="">Farbassoziationen</a>
+
+
+                                        <ul style="border:1px solid #96E3FF;background-color:#D5F3FF;left:50%;width:100%;">
+                                            <li>
+
+                                                <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=watercolor"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=watercolor" width="32" height="32" alt="Wasserfarben" title="Wasserfarben" /></a>
+                                                <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=soft_dot"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=soft_dot" width="32" height="32" alt="Weicher Farbpunkt" title="Weicher Farbpunkt" /></a>
+                                                <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=hard_dot"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=hard_dot" width="32" height="32" alt="Farbpunkt" title="Farbpunkt" /></a>
+
+                                                <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=scribble"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=scribble" width="32" height="32" alt="Scribble" title="Scribble" /></a>
+                                                <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=scribble_round"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=scribble_round" width="32" height="32" alt="Round Scribble" title="Round Scribble" /></a>
+                                                <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=spray"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=spray" width="32" height="32" alt="Spray" title="Spray 1" /></a>
+                                                <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=spray1"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=spray1" width="32" height="32" alt="Spray" title="Spray 2" /></a>
+
+                                                <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=stroke"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=stroke" width="32" height="32" alt="Spray" title="Pinselstrich" /></a>
+                                                <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=splash"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=splash" width="32" height="32" alt="Spray" title="Farbklekse" /></a>
+
+
+
+                                            </li>
+                                        </ul>
+
+                                    </li>
+                                    <li><a class="nav_pulldown"  href="index.php?mode=size&auth=Z6VV1X7G84BSIDF2FVNP" title="">Raumgröße</a></li>
+                                    <li><a class="nav_pulldown"  href="index.php?mode=rate&auth=Z6VV1X7G84BSIDF2FVNP" title="">Raumbewertung</a></li>
+                                    <li><a class="nav_pulldown" href="liste.php ">Auswerteliste</a></li>
+                                </ul>
+                            </li>
+
+                            <li class = "cat2">
+                                <a href="#">
+                                    <img style="width:20px;height:20px;" alt="Style" title="Style" src="/static/images/app_symbols_svg/paint-brush.svg" />
+                                </a>
+                                <ul>
+                                    <li><a href="index.php?iconstyle=svg" title="Komplexe mehrfarbige Symbole"><img style="width:25px;height:25px;" src="/static/images/app_symbols_svg/icon_complex.svg" alt="Komplexe mehrfarbige Symbole" /> Komplexe mehrfarbige Symbole</a></li>
+                                    <li><a href="index.php?size=constant" title="Graustufen"><img style="width:25px;height:25px;" src="/static/images/app_symbols_svg/size_same.svg" alt="Graustufen" /> einheitliche Symbolgr&ouml;&szlig;e</a></li>
+                                    <li><a href="index.php?color=mono" title="Graustufen"><img style="width:25px;height:25px;" src="/static/images/app_symbols_svg/grey.svg" alt="Graustufen" /> Punkte in Graustufen</a></li>
+                                    <li><a href="#">Symbolform</a>
+                                        <ul style="border:1px #999 solid;left:20px;width:100%;">
+                                            <li>
+                                                <a href="index.php?icon=standard" title="Standard"><li style="width:100%">Standardsymbole</a>
+                                            <a href="index.php?icon=375" title="Rund"><li style="width:100%"><img style="width:15px;height:15px;" alt="Rund" src="images_dyn/symbol_svg_ID.php?ID=375&C=00548A&shadow=0.2" /></a>
+                                            <a href="index.php?icon=378" title="Quadrat"><img style="width:15px;height:15px;" alt="Quadrat" src="images_dyn/symbol_svg_ID.php?ID=378&C=00548A&shadow=0.2" /></a>
+                                            <a href="index.php?icon=376" title="Kreis"><img style="width:15px;height:15px;" alt="Kreis" src="images_dyn/symbol_svg_ID.php?ID=376&C=00548A&shadow=0.2" /></a>
+                                            <a href="index.php?icon=379" title="Box"><img style="width:15px;height:15px;" alt="Box" src="images_dyn/symbol_svg_ID.php?ID=379&C=00548A&shadow=0.2" /></a>
+                                            <a href="index.php?icon=426" title="Stern"><img style="width:15px;height:15px;" alt="Stern" src="images_dyn/symbol_svg_ID.php?ID=426&C=00548A&shadow=0.2" /></a>
+                                            <a href="index.php?icon=437" title="Pin"><img style="width:15px;height:15px;" alt="Pin" src="images_dyn/symbol_svg_ID.php?ID=437&C=00548A&shadow=0.2" /></a>
+                                            <a href="index.php?icon=433" title="X"><img style="width:15px;height:15px;" alt="X" src="images_dyn/symbol_svg_ID.php?ID=433&C=00548A&shadow=0.2" /></a>
+                                            <a href="index.php?icon=422" title="Dreieck"><img style="width:15px;height:15px;" alt="Dreieck" src="images_dyn/symbol_svg_ID.php?ID=422&C=00548A&shadow=0.2" /></a>
+                                        </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+
+                            <li class = "cat2">
+                                <a href="#"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/funnel.svg" /></a>
+                                <ul style="left:0px;width:100%;">
+                                    <li>
+                                        <form style="background-color:#EAF9FF;padding: 10px 34px 10px 34px;" method="get">
+                                            <select class="dropdown_select" name="FILTER[SYMBOL]" onchange="this.form.submit()">
+                                                <option class="dropdown_select" value="OFF">Raumtypen (Alle)</option>
+                                                <option  class="dropdown_select" value='1' >Netzwerk, Gen Y</option>
+                                                <option  class="dropdown_select" value='2' >Natur</option>
+                                                <option  class="dropdown_select" value='3' >Spiritualität</option>
+                                                <option  class="dropdown_select" value='4' >Frieden</option>
+                                                <option  class="dropdown_select" value='5' >Konsum</option>
+                                                <option  class="dropdown_select" value='6' >Laut</option>
+                                                <option  class="dropdown_select" value='7' >Männlich</option>
+                                                <option  class="dropdown_select" value='8' >Glamour</option>
+                                                <option  class="dropdown_select" value='9' >Wasser</option>
+                                                <option  class="dropdown_select" value='11' >Konservativ</option>
+                                                <option  class="dropdown_select" value='12' >Technologie</option>
+                                                <option  class="dropdown_select" value='13' >Weiblich</option>
+                                                <option  class="dropdown_select" value='14' >Risiko</option>
+                                                <option  class="dropdown_select" value='15' >Chillig</option>
+                                                <option  class="dropdown_select" value='17' >Anarchie</option>
+                                                <option  class="dropdown_select" value='18' >Unisex</option>
+                                                <option  class="dropdown_select" value='19' >Gefühl</option>
+                                                <option  class="dropdown_select" value='21' >Kultur</option>
+                                                <option  class="dropdown_select" value='22' >Sport</option>
+                                                <option  class="dropdown_select" value='23' >Multikulturell</option>
+                                                <option  class="dropdown_select" value='24' >Unaussprechlich</option>
+                                                <option  class="dropdown_select" value='25' >Gefahr</option>
+                                                <option  class="dropdown_select" value='26' >Leise</option>
+                                                <option  class="dropdown_select" value='27' >Hektisch, Schnell</option>
+                                                <option  class="dropdown_select" value='28' >Städtisch</option>
+                                            </select>
+
+                                            <select class="dropdown_select" name="FILTER[COLOR]" onchange="this.form.submit()">
+                                                <option class="dropdown_select" value="OFF">Farbassoziationen (Alle)</option>
+                                                <option class="dropdown_select" value='1' >Rot</option>
+                                                <option class="dropdown_select" value='4' >Orange</option>
+                                                <option class="dropdown_select" value='5' >Gelb</option>
+                                                <option class="dropdown_select" value='6' >Sepia</option>
+                                                <option class="dropdown_select" value='8' >Grasgrün</option>
+                                                <option class="dropdown_select" value='11' >Waldgrün</option>
+                                                <option class="dropdown_select" value='13' >Türkis</option>
+                                                <option class="dropdown_select" value='16' >Blau</option>
+                                                <option class="dropdown_select" value='17' >Violett</option>
+                                                <option class="dropdown_select" value='20' >Schwarz</option>
+                                                <option class="dropdown_select" value='21' >Grau</option>
+                                                <option class="dropdown_select" value='22' >Weiß</option>
+                                            </select>
+
+                                            <select class="dropdown_select" name="FILTER[SIZE]" onchange="this.form.submit()">
+                                                <option class="dropdown_select" value="OFF">Raumgröße (Alle)</option>
+                                                <option class="dropdown_select" value='1' >XL</option>
+                                                <option class="dropdown_select" value='2' >L</option>
+                                                <option class="dropdown_select" value='3' >M</option>
+                                                <option class="dropdown_select" value='4' >S</option>
+                                                <option class="dropdown_select" value='5' >XS</option>
+                                            </select>
+
+                                            <select class="dropdown_select" name="FILTER[ACTIVE]" onchange="this.form.submit()">
+                                                <option class="dropdown_select" value="OFF">...</option>
+                                                <option class="dropdown_select" value="1">Aktive Punkte</option>
+                                                <option class="dropdown_select" value="0">Inaktive Punkte</option>
+                                            </select>
+
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class = "cat2">
+                                <a href="#" id="slide">
+                                    <!--<a href="javascript:MM_openBrWindow('legend.php','help','scrollbars=yes,width=600,height=900')"> -->
+                                    <img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/legend.svg" alt="Legende" title="Legende" />
+                                </a>
+
+                            </li>
+
+                            <li class = "cat4">{% include "user.inc.html" %}</li>
+                            <li class = "cat2">
+                                <a href="#">
+                                    <img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/settings.svg" />
+                                </a>
+                                <ul>
+                                    <li><a href="admin/" alt="Projektadministration" title="Projektadministration"><span class="pictogram" style="font-size:110%">(</span> Projekte erstellen und verwalten</a></li>
+                                    <!--	<li><a href="mailing.php"><span class="pictogram" style="font-size:120%">E</span> Email Aktionen</a></li> -->
+                                </ul>
+                            </li>
+                        </ul>
+                    </nav>
+                </td>
+
+                <td style="width:1%;vertical-align:top;padding-right:15px;padding-top:5px;">
+                    <form>
+                        <label id="switch" class="switch" title="Punkte clustern">
+                            <input id="cluster" value="1" type="checkbox" checked="checked">
+                            <span class="slider round"></span>
+                        </label>
+                    </form>
+                </td>
+                <td style="width:1%;vertical-align:top;padding-right:15px;padding-top:5px;">
+
+                    <a href="index.php?action=extent&auth=Z6VV1X7G84BSIDF2FVNP&loc=" title="Zoom auf Projektzentrum">
+
+                        <img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/zoom.svg" /></a></td>
+
+                <td style="width:10%;padding-top:10px;vertical-align:top;">
+
+                    <form style="margin-top:0px;padding-top:0px;display:inline;" id="form_resize" method="get">
+
+                        <div style="visibility:hidden; display:none;"><textarea id="iconsize" name="iconsize"></textarea></div>
+                        <!--<input type="hidden" name="mode" value="font_symbols" /> -->
+
+                        <div style="height:10px;" id="slider"></div>
+
+                    </form>
+
+                <td style="width:1%;padding-left:15px;padding-top:6px;">
+                    <a href="usability_survey/index.php" title="Usability Umfrage">
+                        <img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/list.svg" title="Usability Umfrage" alt="Usability Umfrage" />
+                    </a>
+                </td>
+
+                <td style="width:1%;padding-left:15px;vertical-align:middle;">
+                    <img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/placeholder.svg" />
+                </td>
+
+                <td style="width:1%;vertical-align:middle;padding-right:15px;">
+                    &nbsp;<b><span title="306 Punkte in der Karte"><small>306</small></span></b>
+                </td>
+
+                <td style="width:1%;vertical-align:middle;">
+                    <a href="" alt="Projektwebseite" title="Projektwebseite" target="_blank">
+                        <span class="socialm_icon" style="font-size:250%;color:#995A88;">2</span>
+                    </a>
+                </td>
+
+                <td style="width:1%;">
+                    <a href="" alt="Das Projekt auf Facebook" title="youth.places" auf Facebook" target="_blank">
+                    <span class="socialm_icon" style="font-size:250%;color:#3b5998;">f</span>
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="hidden">
+
+        <h2>Raumtypen (Symbole)</h2>
+        <b>Frage: </b><br />
+
+        <table>
+            <tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=1&C=5A8899&shadow=0" /></td><td>Netzwerk, Gen Y</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=2&C=5A8899&shadow=0" /></td><td>Natur</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=3&C=5A8899&shadow=0" /></td><td>Spiritualität</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=4&C=5A8899&shadow=0" /></td><td>Frieden</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=5&C=5A8899&shadow=0" /></td><td>Konsum</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=6&C=5A8899&shadow=0" /></td><td>Laut</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=7&C=5A8899&shadow=0" /></td><td>Männlich</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=8&C=5A8899&shadow=0" /></td><td>Glamour</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=9&C=5A8899&shadow=0" /></td><td>Wasser</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=11&C=5A8899&shadow=0" /></td><td>Konservativ</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=12&C=5A8899&shadow=0" /></td><td>Technologie</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=13&C=5A8899&shadow=0" /></td><td>Weiblich</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=14&C=5A8899&shadow=0" /></td><td>Risiko</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=15&C=5A8899&shadow=0" /></td><td>Chillig</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=17&C=5A8899&shadow=0" /></td><td>Anarchie</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=18&C=5A8899&shadow=0" /></td><td>Unisex</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=19&C=5A8899&shadow=0" /></td><td>Gefühl</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=21&C=5A8899&shadow=0" /></td><td>Kultur</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=22&C=5A8899&shadow=0" /></td><td>Sport</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=23&C=5A8899&shadow=0" /></td><td>Multikulturell</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=24&C=5A8899&shadow=0" /></td><td>Unaussprechlich</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=25&C=5A8899&shadow=0" /></td><td>Gefahr</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=26&C=5A8899&shadow=0" /></td><td>Leise</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=27&C=5A8899&shadow=0" /></td><td>Hektisch, Schnell</td></tr><tr><td><img style="width:40px;height:40px;" src="http://thinkspatial.boku.ac.at/app/images_dyn/symbol_svg_ID.php?ID=28&C=5A8899&shadow=0" /></td><td>Städtisch</td></tr></table>
+        <hr />
+
+        <h2>Farbassoziationen (Farben)</h2>
+        <b>Frage: </b><br />
+
+        <table>
+            <tr><td><div style="width:20px;height:20px;background-color:#9A3C3C;"></div></td><td>Rot</td></tr><tr><td><div style="width:20px;height:20px;background-color:#C69439;"></div></td><td>Orange</td></tr><tr><td><div style="width:20px;height:20px;background-color:#D8C350;"></div></td><td>Gelb</td></tr><tr><td><div style="width:20px;height:20px;background-color:#E9D3BF;"></div></td><td>Sepia</td></tr><tr><td><div style="width:20px;height:20px;background-color:#A7D741;"></div></td><td>Grasgrün</td></tr><tr><td><div style="width:20px;height:20px;background-color:#4C934C;"></div></td><td>Waldgrün</td></tr><tr><td><div style="width:20px;height:20px;background-color:#74CBC2;"></div></td><td>Türkis</td></tr><tr><td><div style="width:20px;height:20px;background-color:#00548A;"></div></td><td>Blau</td></tr><tr><td><div style="width:20px;height:20px;background-color:#835FAB;"></div></td><td>Violett</td></tr><tr><td><div style="width:20px;height:20px;background-color:#000000;"></div></td><td>Schwarz</td></tr><tr><td><div style="width:20px;height:20px;background-color:#6F6F6F;"></div></td><td>Grau</td></tr><tr><td><div style="width:20px;height:20px;background-color:#FFFFFF;"></div></td><td>Weiß</td></tr></table>
+        <hr />
+
+        <h2>Raumgröße (Gr&ouml;&szlig;en)</h2>
+        <b>Frage: </b><br />
+
+        <table>
+            <tr><td style="text-align:right;"><img style="width:160px;height:160px;" valign="middle" src="http://thinkspatial.boku.ac.at/app/size/size_circle.png"></td><td>XL</td></tr><tr><td style="text-align:right;"><img style="width:120px;height:120px;" valign="middle" src="http://thinkspatial.boku.ac.at/app/size/size_circle.png"></td><td>L</td></tr><tr><td style="text-align:right;"><img style="width:80px;height:80px;" valign="middle" src="http://thinkspatial.boku.ac.at/app/size/size_circle.png"></td><td>M</td></tr><tr><td style="text-align:right;"><img style="width:50px;height:50px;" valign="middle" src="http://thinkspatial.boku.ac.at/app/size/size_circle.png"></td><td>S</td></tr><tr><td style="text-align:right;"><img style="width:30px;height:30px;" valign="middle" src="http://thinkspatial.boku.ac.at/app/size/size_circle.png"></td><td>XS</td></tr></table>
+
+    </div>
+
+    {% block content %}
+
+    {% endblock %}
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+<a class="nav_pulldown" href="{% if user.is_authenticated %}#{% else %}{% url 'login' %}{% endif %}" alt="Userinfo" title="Userinfo"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/user_{% if user.is_authenticated %}on{% else %}off{% endif %}.svg" /></a>
+{% if user.is_authenticated %}
+    <ul>
+        <li><a class="nav_pulldown" href="{% url 'logout' %}" alt="Abmelden" title="Abmelden"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/exit.svg" /> Abmelden</a></li>
+        <li><a href="{% url 'password_change' %}" title="Passwort &auml;ndern">Passwort &auml;ndern</a></li>
+    </ul>
+{% endif %}

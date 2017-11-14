@@ -1,0 +1,154 @@
+.leaflet-container {
+    background-color:rgba(255,0,0,0.0);
+}
+
+img { border:none; }
+body { // background-image:URL('static/images/bg_logo.png'); background-repeat: no-repeat;height:100%;
+}
+
+.isResizable {
+    border: 1px solid #ccc;
+    padding-bottom:10px;
+    overflow: hidden;
+    width: 100%;
+    height: 600px;
+
+    /* resize: both;
+    min-width: 600px;
+    min-height: 400px;
+    max-width: 100%;
+    max-height: 100%; */
+}
+
+
+#map {
+    width: 100%;
+    height: 100%;
+    z-index:1;
+}
+
+nav
+{
+    width: 800px;
+}
+
+#tags
+{
+    display: none;
+}
+
+/*  PRINT STYLES */
+@page
+{
+    margin: 0;
+}
+
+@media print
+{
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
+}
+
+@media screen
+{
+    .no-screen, .no-screen *
+    {
+        display: none !important;
+    }
+}
+
+/* The switch - the box around the slider */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+}
+
+/* Hide default HTML checkbox
+.switch input {display:none;}*/
+
+/* The slider */
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 1px;
+    bottom: 1px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(20px);
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+}
+
+/* Rounded sliders */
+.slider.round {
+    border-radius: 30px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+.hidden {
+    width:25%;
+    height:80%;
+    overflow-y:scroll;
+
+    position:absolute;
+    left:-1000px;
+    background:#F4FCFF;
+    color:#000;
+    z-index:5000;
+}
+
+input {
+    color:#333;
+    /* background-color:#f5f6f1; */
+    font-size:20px;
+    /* border: 1px solid #999; */
+    vertical-align:middle;
+    font-style:italic;
+}
+
+input[type=text] {
+    height: 30px;
+    padding-left:5px;
+    box-shadow: 0 1px 0 #ffffff, inset 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+input[type=password] {
+    height: 30px;
+    padding-left:5px;
+    box-shadow: 0 1px 0 #ffffff, inset 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+
+input.clear {border: none;}
