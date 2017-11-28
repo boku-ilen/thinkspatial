@@ -11,6 +11,10 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+import mimetypes
+
+# fixes development bug?
+mimetypes.add_type("text/css", ".css", True)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -70,6 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'thinkspatial_django.wsgi.application'
 
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
@@ -119,3 +124,5 @@ STATIC_URL = '/static/'
 # for now we do not have login and logout info pages
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# GDAL_LIBRARY_PATH = 'C:/OSGeo4W64/bin/gdal111.dll'

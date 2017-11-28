@@ -29,8 +29,7 @@
     <link rel="stylesheet" href="{% static "css/fancybox/jquery.fancybox.css" %}" type="text/css" media="screen" />
     <script type="text/javascript" src="{%  static "js/fancybox/jquery.fancybox.pack.js" %}"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/themes/base/jquery-ui.css" type="text/css" />
-    <link rel="stylesheet" type="text/css" href="http://thinkspatial.boku.ac.at/app/style.php" />
-    <link rel="stylesheet" type="text/css" href="http://thinkspatial.boku.ac.at/app/style_dropdown.php" />
+    <link rel="stylesheet" type="text/css" href="{% url "stylecss" %}" />
     <link rel="stylesheet" type="text/css" href="{%  static "css/thinkspatial.css" %}" />
     <script src="{% static "js/leaflet/tile.stamen.js" %}"></script>
     <script type="text/javascript" src="{%  static "js/thinkspatial.js" %}"></script>
@@ -56,7 +55,6 @@
     <div class="no-print" style="height:46px;background-color:#F4FCFF;">
         <table cellpadding="0" cellspacing="0" style=" vertical-align:middle;width:100%;border:0px;">
             <tr>
-
                 <td>
                     <nav>
                         <ul>
@@ -73,56 +71,21 @@
                                     <img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/pin.svg" />
                                 </a>
                             </li>
-
                             <li class = "cat5">
                                 <a href="#"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/layers.svg" alt="Meine Projekte" title="Meine Projekte" /></a>
                                 <ul>
-                                    <li><a href='index.php?init=1&action=extent&auth=FVWXWXV3Z4HSBHXRGDSE'>Think Spatial!</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=HCPXWYV2Z4KSBHXFGDTQ'>Korneuburg 2036</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=Z6VV1X7G84BSIDF2FVNP'>youth.places</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=BLIK81ISSNNNXLPWLR88'>Raumnutzung</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=XQ5ECD6W6AQ8EBM23XXW'>HOT SPOTS Josefstadt</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=3EQTS5LPDVNB918FBZZT'>Visionen für Wien</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=8QZ2V9IBCARNKQ5AN9ND'>TransWind</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=T4K8WA4PUXFQ5WAGZF3T'>Visionen für Wien</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=IQWC4R9P5PSZIKM85421'>Transforming Spaces</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=3DFZQV57VZ3LISTFX36L'>ILEN research map</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=KUHXQF2SL857ZAWX7DPL'>Transforming Mood</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=E47RBTKNU1RDCPM73YMN'>Natur vor der Haustür</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=2DD1AD58HCQA77LLY7HY'></a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=RI4B9H7U8VINF42MULCV'>AktiveOrte</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=E6SI6GZ7GLZX2KLTM1SR'>AktiveWege</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=Y5K99TCN29LTL7UM13AW'>Un/Sicher-Unsicherheit</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=MNR3EX9KICBZERC3DQAA'>Un/Sicher-Unsicherheit</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=2M3RLNK1HQLCFM6RZYL4'>ThinkSpatial! Themen</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=ASZ5HRMPYNKTG8N1YL5W'>Lehmbau im Weinviertel</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=F5MMHPLN5WLWYIHXL2WG'>Testprojekt</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=L6XZUIP2CBP8NKDXKFFN'>Freiraum und Gesundheit</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=PD4QLDTP287VXXT8ILX8'>Citizen Science Methoden</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=51X2KSBPFZN41FP5STYL'>3B Geschichte</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=T8R2VX2YKHCUAZ5F8ND2'>Anglizismen: Makes your day?</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=WN6RYYBDW623N15B3VCP'>1984:Kameras</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=XSV3T7ZXP5L6PTRZ9TH5'>Floridsdorf</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=ATPKIIQWNUVVFQ7PKTHR'>Sagen aus Wien</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=YD72BEDLKHPKMSUAWVUQ'>Sagen aus Wien</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=84K639PAZNNK5WXD5DIX'>ThinkSpatial!@ERN</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=UAZT2YLLSBAXR4HWII5S'>Hollabrunn</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=MW159L769AFI22YI4L32'>Think Spatial! Demo</a></li>
-                                    <li><a href='index.php?init=1&action=extent&auth=1RTLB4VZCHW9MXZQ4Q8I'>TEST</a></li>
+                                    {% for project in projects %}
+                                        <li><a href='{% url "change_project" project_id=project.id %}'>{{ project.name }}</a></li>
+                                    {% endfor %}
                                 </ul>
                             </li>
-
                             <li class = "cat2">
                                 <a href="#"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/map.svg" alt="Kartenansichten" title="Kartenansichten" /></a>
                                 <ul>
-
                                     <li><a class="nav_pulldown" href="index.php?mode=font_symbols&auth=Z6VV1X7G84BSIDF2FVNP" title="">Raumtypen</a></li>
                                     <li><a class="nav_pulldown"  href="index.php?mode=colors_gd&auth=Z6VV1X7G84BSIDF2FVNP" title="">Farbassoziationen</a>
-
-
                                         <ul style="border:1px solid #96E3FF;background-color:#D5F3FF;left:50%;width:100%;">
                                             <li>
-
                                                 <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=watercolor"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=watercolor" width="32" height="32" alt="Wasserfarben" title="Wasserfarben" /></a>
                                                 <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=soft_dot"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=soft_dot" width="32" height="32" alt="Weicher Farbpunkt" title="Weicher Farbpunkt" /></a>
                                                 <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=hard_dot"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=hard_dot" width="32" height="32" alt="Farbpunkt" title="Farbpunkt" /></a>
@@ -134,19 +97,14 @@
 
                                                 <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=stroke"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=stroke" width="32" height="32" alt="Spray" title="Pinselstrich" /></a>
                                                 <a class="coloricon" style="float:left;" href="index.php?mode=colors_gd&style=splash"><img style="float:left;" src="images_dyn/img_color.php?C=5A8899&STYLE=splash" width="32" height="32" alt="Spray" title="Farbklekse" /></a>
-
-
-
                                             </li>
                                         </ul>
-
                                     </li>
                                     <li><a class="nav_pulldown"  href="index.php?mode=size&auth=Z6VV1X7G84BSIDF2FVNP" title="">Raumgröße</a></li>
                                     <li><a class="nav_pulldown"  href="index.php?mode=rate&auth=Z6VV1X7G84BSIDF2FVNP" title="">Raumbewertung</a></li>
                                     <li><a class="nav_pulldown" href="liste.php ">Auswerteliste</a></li>
                                 </ul>
                             </li>
-
                             <li class = "cat2">
                                 <a href="#">
                                     <img style="width:20px;height:20px;" alt="Style" title="Style" src="/static/images/app_symbols_svg/paint-brush.svg" />
@@ -172,7 +130,6 @@
                                     </li>
                                 </ul>
                             </li>
-
                             <li class = "cat2">
                                 <a href="#"><img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/funnel.svg" /></a>
                                 <ul style="left:0px;width:100%;">
@@ -244,12 +201,9 @@
                             </li>
                             <li class = "cat2">
                                 <a href="#" id="slide">
-                                    <!--<a href="javascript:MM_openBrWindow('legend.php','help','scrollbars=yes,width=600,height=900')"> -->
                                     <img style="width:20px;height:20px;" src="/static/images/app_symbols_svg/legend.svg" alt="Legende" title="Legende" />
                                 </a>
-
                             </li>
-
                             <li class = "cat4">{% include "user.inc.html" %}</li>
                             <li class = "cat2">
                                 <a href="#">
@@ -263,7 +217,6 @@
                         </ul>
                     </nav>
                 </td>
-
                 <td style="width:1%;vertical-align:top;padding-right:15px;padding-top:5px;">
                     <form>
                         <label id="switch" class="switch" title="Punkte clustern">
