@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='layer',
             name='project',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='thinkspatial_app.Project'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='thinkspatial_web.Project'),
         ),
         migrations.AddField(
             model_name='layer',
@@ -146,7 +146,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='geometry',
             name='layer',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='thinkspatial_app.Layer'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='thinkspatial_web.Layer'),
         ),
         migrations.AddField(
             model_name='geometry',
@@ -156,12 +156,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='category',
             name='category_group',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='thinkspatial_app.Category_group'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='thinkspatial_web.Category_group'),
         ),
         migrations.AddField(
             model_name='category',
             name='category_type',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='thinkspatial_app.Category_type'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='thinkspatial_web.Category_type'),
         ),
         migrations.AddField(
             model_name='category',
@@ -176,7 +176,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='category',
             name='symbol',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='thinkspatial_app.Symbol'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='+', to='thinkspatial_web.Symbol'),
         ),
         migrations.AddField(
             model_name='category',
