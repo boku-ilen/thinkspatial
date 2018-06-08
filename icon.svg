@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="210mm"
+   height="210mm"
+   viewBox="0 0 744.09449 744.09448"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.91 r13725"
+   sodipodi:docname="icon.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="-218.09784"
+     inkscape:cy="84.960529"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1018"
+     inkscape:window-x="-8"
+     inkscape:window-y="80"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-308.26772)">
+    <ellipse
+       style="fill:none;stroke:#000000;stroke-width:64.47782135;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path4136"
+       cx="375.52374"
+       cy="682.89948"
+       rx="342.76108"
+       ry="342.76111"
+       inkscape:export-filename="C:\Users\graf\Documents\favicon.png"
+       inkscape:export-xdpi="30.719999"
+       inkscape:export-ydpi="30.719999" />
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:549.59686279px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       x="345.64316"
+       y="872.84772"
+       id="text4138"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="C:\Users\graf\Documents\favicon.png"
+       inkscape:export-xdpi="30.719999"
+       inkscape:export-ydpi="30.719999"><tspan
+         sodipodi:role="line"
+         id="tspan4140"
+         x="345.64316"
+         y="872.84772"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:500px;font-family:Impact;-inkscape-font-specification:'Impact Condensed'">S</tspan></text>
+    <g
+       transform="matrix(1,0,0,-1,4,0)"
+       style="font-style:normal;font-weight:normal;font-size:549.59686279px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="text4138-1"
+       inkscape:export-filename="C:\Users\graf\Documents\favicon.png"
+       inkscape:export-xdpi="30.719999"
+       inkscape:export-ydpi="30.719999">
+      <path
+         d="m 286.58206,-877.13693 -16.11328,297.60742 -76.17187,0 -16.11329,-297.60742 108.39844,0 z m -8.05664,316.16211 0,79.10156 -92.28516,0 0,-79.10156 92.28516,0 z"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:condensed;font-size:500px;font-family:Impact;-inkscape-font-specification:'Impact Condensed'"
+         id="path4161"
+         inkscape:connector-curvature="0" />
+      <rect
+         style="fill:#000000;stroke:none;stroke-width:45;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect4163"
+         width="91.428581"
+         height="75.714279"
+         x="135.71428"
+         y="579.50507"
+         transform="scale(1,-1)"
+         ry="0" />
+      <rect
+         style="font-style:normal;font-weight:normal;font-size:549.59686279px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:45;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+         id="rect4163-9"
+         width="91.428581"
+         height="75.714279"
+         x="233.42856"
+         y="579.50507"
+         ry="0"
+         transform="scale(1,-1)" />
+    </g>
+  </g>
+</svg>

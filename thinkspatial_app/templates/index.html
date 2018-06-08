@@ -1,23 +1,23 @@
 {% extends "base.html" %}
+{% load i18n %}
+{% load l10n %}
 
 {% block content %}
 <div id="map"></div>
 
-<form action="">
+<form action=""> <!-- TODO: for what is this needed? -->
     <input type="hidden" id="current_zoom" value="" />
     <input type="hidden" id="current_view" value="" />
     <input type="hidden" id="current_layer" value="" />
 </form>
 
-<!-- <select id="wmsDirectoryLayer"></select> -->
-
 <div style="background-color:#F4FCFF;width:100%">
-
     <div class="no-print" style="float:right; margin-right:80px;">
         <div class="fb-like" data-href="" data-width="450" data-layout="button_count" data-show-faces="true" data-send="true"></div>
     </div>
-
 </div>
-<div style="float:right;" id="txtHint"></div><div style="float:left; padding:10px;" id="ScaleLine"></div>
-<div class="no-screen" style="float:left;padding:10px;">Think Spatial! Karte: youth.places | Erstellt am 2017-11-10 14:44:13</div>
+
+<div id="txtHint"></div>
+<div id="ScaleLine"></div>
+<div class="no-screen" id="printInfo">Think Spatial! {% trans "map:" %} {{ project_name }} | {% trans "created at:" %} {{ timestamp|localize }}</div>
 {% endblock %}

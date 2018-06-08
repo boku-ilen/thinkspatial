@@ -1,15 +1,15 @@
 <!-- TODO: recommended implementation in the future: render the image while the color is changed in admin interface and reference it here via an unique identifier -->
-<div class="no-print" id="header" style="background-image:URL('http://thinkspatial.boku.ac.at/app/images_dyn/img_background.php?C=96E3FF');">
+<div class="no-print" id="header">
 
     <!-- ########################################  HEADER ####################################### -->
     <table style="width:100%;vertical-align:middle;">
         <tr>
             <td style="padding-left:10px; padding-right:10px;width:1%;">
-                <a href="/" title="Home"><h1 style="margin:0px;">youth.places</h1></a>
+                <a href="/" title="Home"><h1 style="margin:0px;">{{ project_name }}</h1></a>
             </td>
 
             <td class="projinfo" style="width:90%;padding-left:10px; border-left:1px solid #96E3FF;">
-                Willkommen bei youthPlaces, einer Plattform zur Erhebung, Auswertung und Visualisierung raumbezogener Informationen. youthPlaces ist im Rahmen des Projekts I AM HERE! entstanden, welches die Analyse des Raumverhalten von Jugendlichen in der Stadt zum Ziel hat. Weitere Informationen zum Projekt unter iamhere.boku.ac.at
+                {{ project_info }}
             </td>
             <td>
                 <img src="/static/images/logo_boku_w.png" style="width:100px;height:100px;" />

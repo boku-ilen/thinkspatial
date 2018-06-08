@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" version="1.1">
+    {% if shadow %}
+    <defs>
+        <filter id = "dropshadow" width = "130%" height = "130%"><feOffset result = "offOut" in = "SourceAlpha" dx = "7" dy = "7" />
+            <feColorMatrix result = "matrixOut" in = "offOut" type = "matrix" values = ".3 .3 .3 {{ shadow_value }} 0, .3 .3 .3 {{ shadow_value }} 0, .3 .3 .3 {{ shadow_value }} 0, 0 0 0 1 0" />
+            <feGaussianBlur result = "blurOut" in = "matrixOut" stdDeviation = "10" />
+            <feBlend in = "SourceGraphic" in2 = "blurOut" mode = "normal" />
+        </filter>
+    </defs>
+    {% endif %}
+    <g fill="#{{ color }}" style="padding:0 auto;" {% if shadow %}filter="url(#dropshadow)"{% endif %} transform="scale({{ scale }}) translate({{ translate_x }}, {{ translate_y }})">
+        <path transform="translate(0,0) rotate(180) scale(-1, 1)" d="{{ symbol_code }}" />
+    </g>
+</svg>

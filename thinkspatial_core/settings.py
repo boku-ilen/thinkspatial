@@ -54,12 +54,12 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'thinkspatial_django.urls'
+ROOT_URLCONF = 'thinkspatial_core.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -72,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'thinkspatial_django.wsgi.application'
+WSGI_APPLICATION = 'thinkspatial_core.wsgi.application'
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
 
