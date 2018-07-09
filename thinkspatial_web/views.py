@@ -11,17 +11,28 @@ logger = logging.getLogger(__name__)
 
 
 # the main controller for the map display
-def index(request):
+def index(request, template=None):
 
     # get the default project if there is no project defined in the session yet
     project = request.session.get("project")
     if project is None:
         project = None  # FIXME: load project from database
 
-    context = {'user': request.user,
-               'project_name': 'youth.places',  # TODO: change default based on project
-               'project_info': 'this is a placeholder test description',
-               'timestamp': datetime.datetime.now()}
+    # set the template style if it is given as parameter
+    #TODO: set template also based on project settings or user preferences
+    if template is not None:
+        request.session["template"] = template
+    else:
+        if "template" not in request.session:
+            request.session["template"] = "old"  # set default template
+
+    context = {
+        'user': request.user,
+        'project_name': 'youth.places',  # TODO: change default based on project
+        'project_info': 'this is a placeholder test description',
+        'timestamp': datetime.datetime.now(),
+        'template': request.session["template"],
+    }
 
     return render(request, "index.html", context)
 

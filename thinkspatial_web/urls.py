@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^favicon.ico$', RedirectView.as_view(url=staticfiles_storage.url('favicon.ico'), permanent=False), name="favicon"),
     # the main map view
     url(r'^$', views.index, name='index'),
+    url(r'^template/(?P<template>[a-zA-Z0-9]+)', views.index, name="index"),  # set template
     # the dynamic style sheet
     url(r'^css_dyn/style.css', views.stylecss, name="stylecss"),
     url(r'^images_dyn/img_color.png', views.imgcolor, name="imgcolor"),
