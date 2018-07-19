@@ -39,6 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
+    'rest_framework',
+    'rest_framework_gis',
+    'djgeojson',
+    'leaflet',
     'thinkspatial_web',
 ]
 
@@ -119,3 +124,4 @@ LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
 # GDAL_LIBRARY_PATH = 'C:/OSGeo4W64/bin/gdal111.dll'
+SPATIALITE_LIBRARY_PATH = '../mod_spatialite'
