@@ -1,5 +1,7 @@
 from django.contrib.gis.db import models
-from .core import Base
+from thinkspatial_web.models.core import Base
+from thinkspatial_web.models.structure import Project
+
 
 # represents a Layer
 class Layer(Base):
@@ -21,6 +23,12 @@ class Layer(Base):
 
     # type of geometry
     geometry_type = models.PositiveIntegerField(choices=GEOMETRY_TYPE_CHOICES)
+
+    @staticmethod
+    def to_geometry_type(type):
+        for geom_type in Layer.GEOMETRY_TYPE_CHOICES:
+            if type.upper() == geom_type[1]:
+                return geom_type[0]
 
 
 # represents a single geometry on a map
@@ -54,16 +62,22 @@ class Attribute(Base):
     # the type of the attribute
     type = models.PositiveIntegerField(choices=ATTRIBUTE_TYPE)
 
+    @staticmethod
+    def to_attribute_type(type):
+        for attribute in Attribute.ATTRIBUTE_TYPE:
+            if type.upper()[:3] == attribute[1][:3]:
+                return  attribute[0]
+
 
 class AttributeValue(Base):
 
     # the associated attribute
     attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT)
 
-    string_value = models.TextField(default=None)
-    integer_value = models.BigIntegerField()
-    float_value = models.FloatField()
-    date_value = models.DateTimeField()
+    string_value = models.TextField(default=None, null=True)
+    integer_value = models.BigIntegerField(default=None, null=True)
+    float_value = models.FloatField(default=None, null=True)
+    date_value = models.DateTimeField(default=None, null=True)
 
     TYPE_TO_VALUE_ASSOCIATION = {
         1: string_value,
@@ -76,4 +90,15 @@ class AttributeValue(Base):
     @property
     def value(self):
         return self.TYPE_TO_VALUE_ASSOCIATION.get(self.attribute.type)
+
+    @value.setter
+    def value(self, value):
+        if self.attribute.type == 1:
+            self.string_value = value
+        elif self.attribute.type == 2:
+            self.integer_value = value
+        elif self.attribute.type == 3:
+            self.float_value = value
+        elif self.attribute.type == 4:
+            self.date_value = value
 

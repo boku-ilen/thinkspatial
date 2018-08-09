@@ -1,8 +1,8 @@
 from django.contrib.gis.db import models
-from .core import Base
+from thinkspatial_web.models.core import Base
 
 # a 'klecks'
-def Style(Base):
+class Style(Base):
 
     name = models.TextField(default=None)
 
@@ -49,3 +49,25 @@ class Symbol(Base):
 
     # the alternative complex symbol as a file (svg) (optional)
     file = models.FilePathField(default=None)
+
+
+#
+class Basemap(Base):
+
+    # the name of the basemap
+    name = models.TextField(default=None)
+
+    # the http string of the basemap in the format [http[s]]//{s}.domain/...
+    url_string = models.TextField(default=None)
+
+    # html string of the basemap copyright
+    attribution = models.TextField(default=None)
+
+    type = models.TextField(default=None)
+
+    zoom_min = models.IntegerField()
+
+    zoom_max = models.IntegerField()
+
+    # imploded array of subdomain names
+    subdomains = models.TextField(default=None)

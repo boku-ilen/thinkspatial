@@ -1,5 +1,6 @@
 from django.contrib.gis.db import models
-from .core import Base
+from thinkspatial_web.models.representation import Symbol
+from thinkspatial_web.models.core import Base
 
 # represents a Project
 class Project(Base):

@@ -1,5 +1,5 @@
 from django.contrib.gis.db import models
-from .core import Base
+from thinkspatial_web.models.core import Base
 from django.contrib.auth.models import User
 
 
