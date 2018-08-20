@@ -121,6 +121,3 @@ STATIC_URL = '/static/'
 # for now we do not have login and logout info pages
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
-
-# GDAL_LIBRARY_PATH = 'C:/OSGeo4W64/bin/gdal111.dll'
-SPATIALITE_LIBRARY_PATH = '../mod_spatialite'
