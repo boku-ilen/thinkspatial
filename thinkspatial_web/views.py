@@ -1,11 +1,16 @@
 from django.conf import settings
+from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import render
-from django.http import JsonResponse, HttpResponse
+from django.http import HttpResponse
+from django.core import serializers
+
+from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute
+
 from PIL import Image
-from .models import Symbol
 import os
 import logging
 import datetime
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -16,10 +21,22 @@ def index(request, template=None):
     # get the default project if there is no project defined in the session yet
     project = request.session.get("project")
     if project is None:
-        project = None  # FIXME: load project from database
+        project = Project.objects.get(pk=10)  # FIXME: how to determine default project
+
+    # get the associated basemaps
+    basemaps = project.basemaps.all()
+
+    # get the associated layers & predefined views
+    layers = Layer.objects.filter(project=project, enabled=True)
+    views = {}
+    for layer in layers:
+        views[layer] = View.objects.filter(layer=layer)
+
+    # read center of the current project
+    center = GEOSGeometry(project.center_wkt)
 
     # set the template style if it is given as parameter
-    #TODO: set template also based on project settings or user preferences
+    # TODO: set template also based on project settings or user preferences
     if template is not None:
         request.session["template"] = template
     else:
@@ -28,8 +45,17 @@ def index(request, template=None):
 
     context = {
         'user': request.user,
-        'project_name': 'youth.places',  # TODO: change default based on project
-        'project_info': 'this is a placeholder test description',
+        'project_id': project.id,
+        'layers': layers,
+        'views': views,
+        'basemaps': basemaps,
+        'zoom_min': project.zoom_min,
+        'zoom_max': project.zoom_max,
+        'zoom_default': project.zoom_default,
+        'center_long': center.x,
+        'center_lat': center.y,
+        'project_name': project.name,
+        'project_info': project.info,
         'timestamp': datetime.datetime.now(),
         'template': request.session["template"],
     }
@@ -71,16 +97,42 @@ def imgcolor(request):
 
 
 # returns a list of POIs
-def poigetjson(request):
+def poigetgeojson(request, layer):
 
     # check for a valid session and the current project
-    project = request.session.get("project")
-    response = {}
-    if project is not None:
-        print()
-        # TODO: business logic
+    # project = request.session.get("project")
+    lyr = Layer.objects.get(pk=layer)
 
-    return JsonResponse(response)
+    response = '{'
+    if lyr is not None:
+
+        response += '"type": "FeatureCollection", "features": ['
+        # TODO: add crs?
+
+        geometries = Geometry.objects.filter(layer=lyr) # , geom__within=boundingbox
+        view_attributes = Attribute.objects.filter(view__layer=lyr, view__enabled=True)
+
+        first = True
+        for geometry in geometries:
+
+            # get properties from all attributes which are referenced in prepared views
+            prop = {}
+            for attribute in view_attributes:
+                properties = AttributeValue.objects.filter(attribute=attribute)
+                if properties:
+                    prop[attribute.name] = properties[0].value
+                else:
+                    prop[attribute.name] = None
+
+            if not first:
+                response += ','
+            response += '{"type": "Feature", "geometry": ' + geometry.geom.json + ', "properties": ' + json.dumps(prop) + '}'
+            first = False
+
+        response += "]"
+    response += '}'
+
+    return HttpResponse(response, content_type="application/geo+json")
 
 
 def symbolsvg(request, id, color, shadow=None):

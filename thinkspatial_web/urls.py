@@ -16,7 +16,7 @@ urlpatterns = [
     # dynamically scaled svg image
     url(r'^images_dyn/(?P<id>[0-9]+)/(?P<color>[0-9a-fA-F]{6})/symbol_svg_id.svg(?:shadow=(?P<shadow>\d+)/)?$', views.symbolsvg, name="symbolsvg"),
     # get the poi geometries
-    url(r'^ajax/leaflet_get_pois.json', views.poigetjson, name="poigetjson"),
+    url(r'^ajax/(?P<layer>[a-zA-Z0-9]+)/layer.geojson', views.poigetgeojson, name="poigetgeojson"),
     # post the cluster data
     url(r'^ajax/cluster', views.cluster, name="ajax_cluster"),
     # insert a new poi
