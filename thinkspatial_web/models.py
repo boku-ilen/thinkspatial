@@ -62,10 +62,10 @@ class Project(Base):
     location = models.TextField(default=None)
 
     # wkt representation of the default center of the project map
-    center_wkt = models.TextField(default=None)
+    center_wkt = models.GeometryField(default=None)
 
     # wkt representation of the maximum bounding box of the project map
-    bounding_wkt = models.TextField(default=None)
+    bounding_wkt = models.GeometryField(default=None)
 
     # the zoom settings of the project
     zoom_default = models.PositiveIntegerField(default=5)
