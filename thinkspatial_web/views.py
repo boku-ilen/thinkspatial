@@ -3,6 +3,7 @@ from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.core import serializers
+from django.utils.translation import ugettext as _
 
 from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute
 
@@ -21,7 +22,7 @@ def index(request, template=None):
     # get the default project if there is no project defined in the session yet
     project = request.session.get("project")
     if project is None:
-        project = Project.objects.get(pk=10)  # FIXME: how to determine default project
+        project = Project.objects.get(pk=13)  # FIXME: how to determine default project
 
     # get the associated basemaps
     basemaps = project.basemaps.all()
@@ -176,3 +177,6 @@ def newPOI(request, lat, long):
 # TODO: implement
 def cluster(request):
     return None
+
+def getString(request, key):
+    return HttpResponse(json.dumps({key: _(key)}), content_type="application/json")

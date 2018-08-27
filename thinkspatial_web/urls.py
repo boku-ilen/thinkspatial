@@ -93,6 +93,9 @@ urlpatterns = [
     # insert a new poi
     url(r'^(?P<lat>[0-9]+\.[0-9]*)/(?P<long>[0-9]+\.[0-9]*)/newPOI', views.newPOI, name="newPOI"),
     
+    #getString
+    url(r'^app/languages/(?P<key>[a-z_]+)', views.getString, name="getString"),
+    
     url(r"^rest/", include(router.urls)),
     url(r"^rest/api-auth/", include("rest_framework.urls", namespace="rest_framework"))
 ]
