@@ -1,0 +1,66 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-08-27 12:39+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: thinkspatial_web/templates/index.html:23
+msgid "map:"
+msgstr "Map:"
+
+#: thinkspatial_web/templates/index.html:23
+msgid "created at:"
+msgstr "Created at:"
+
+#: thinkspatial_web/templates/styles/header.html:6
+msgid "main page"
+msgstr "Main Page"
+
+#: thinkspatial_web/templates/styles/old/base.html:31
+msgid "project_examples"
+msgstr "Project examples"
+
+#: thinkspatial_web/templates/styles/old/base.html:32
+msgid "project_info"
+msgstr "Project information"
+
+#: thinkspatial_web/templates/styles/old/base.html:33
+msgid "project_disclaimer_licenses"
+msgstr "Disclaimer and licenses"
+
+#: thinkspatial_web/templates/styles/old/base.html:37
+msgid "locate"
+msgstr "Locate current position"
+
+#: thinkspatial_web/templates/styles/old/base.html:52
+msgid "type_of_space"
+msgstr "Type of space"
+
+#: thinkspatial_web/templates/styles/old/base.html:53
+msgid "color_associations"
+msgstr "Color associations"
+
+#: thinkspatial_web/templates/styles/old/base.html:70
+msgid "space_size"
+msgstr "Space sze"
+
+#: thinkspatial_web/templates/styles/old/base.html:71
+msgid "space_rating"
+msgstr "Space rating"
+
+#: thinkspatial_web/templates/styles/old/base.html:72
+msgid "analysis"
+msgstr "Analysis"
