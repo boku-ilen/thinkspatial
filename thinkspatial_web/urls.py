@@ -71,31 +71,45 @@ class ProjectList(generics.ListAPIView):
             queryset = queryset.filter(create_user_id=user)
         return queryset
 
+
 router = routers.DefaultRouter()
 router.register(r"users", UserViewSet)
 router.register(r"projects", ProjectViewSet, base_name="projects")
 
+
 urlpatterns = [
     # the favicon
-    url(r'^favicon.ico$', RedirectView.as_view(url=staticfiles_storage.url('favicon.ico'), permanent=False), name="favicon"),
+    url(r'^favicon.ico$', RedirectView.as_view(url=staticfiles_storage.url('favicon.ico'), permanent=False),
+        name="favicon"),
+
     # the main map view
     url(r'^$', views.index, name='index'),
-    url(r'^template/(?P<template>[a-zA-Z0-9]+)', views.index, name="index"),  # set template
+
+    # change the used template  TODO: is this even necessairy or do we change it only be setup and not on the fly?
+    url(r'^template/(?P<template>[a-zA-Z0-9]+)', views.index, name="index"),
+
     # the dynamic style sheet
     url(r'^css_dyn/style.css', views.stylecss, name="stylecss"),
+
     url(r'^images_dyn/img_color.png', views.imgcolor, name="imgcolor"),
+
     # dynamically scaled svg image
-    url(r'^images_dyn/(?P<id>[0-9]+)/(?P<color>[0-9a-fA-F]{6})/symbol_svg_id.svg(?:shadow=(?P<shadow>\d+)/)?$', views.symbolsvg, name="symbolsvg"),
+    url(r'^images_dyn/(?P<id>[0-9]+)/(?P<color>[0-9a-fA-F]{6})/symbol_svg_id.svg(?:shadow=(?P<shadow>\d+)/)?$',
+        views.symbolsvg, name="symbolsvg"),
+
     # get the poi geometries
     url(r'^ajax/(?P<layer>[a-zA-Z0-9]+)/layer.geojson', views.poigetgeojson, name="poigetgeojson"),
+
     # post the cluster data
     url(r'^ajax/cluster', views.cluster, name="ajax_cluster"),
-    # insert a new poi
+
+    # insert a new poi  TODO: do we generalize the input of geodata (polygons, lines, ..)
     url(r'^(?P<lat>[0-9]+\.[0-9]*)/(?P<long>[0-9]+\.[0-9]*)/newPOI', views.newPOI, name="newPOI"),
     
-    #getString
+    # get the translation string based on a key
     url(r'^app/languages/(?P<key>[a-z_]+)', views.getString, name="getString"),
-    
+
+    # configuration for the REST-Framework (app-api)
     url(r"^rest/", include(router.urls)),
     url(r"^rest/api-auth/", include("rest_framework.urls", namespace="rest_framework"))
 ]
