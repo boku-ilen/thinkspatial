@@ -4,14 +4,41 @@
 {% load l10n %}
 
 {% block content %}
+
+<script language="JavaScript">
+    // CONFIGURE THINKSPATIAL LEAFLET COMPONENT
+
+    // write basemaps into a javascript array
+    var basemaps = {
+    {% for basemap in basemaps %}
+        {% if not forloop.first %}, {% endif %}
+        "{{ basemap.name }}": L.tileLayer("{{ basemap.url_string }}", {
+            attribution: "{{ basemap.attribution }}", subdomains: {{ basemap.subdomains }},
+            zoom_min: {{basemap.zoom_min}}, zoom_max: {{ basemap.zoom_max }},
+            type: "{{ basemap.type }}"})
+    {% endfor %}
+    };
+
+    // write layer information into a javascript array
+    var layers = [
+    {% for layer in layers %}
+        {% if not forloop.first %}, {% endif %}
+        {id: {{ layer.id }}, name: "{{ layer.name }}", type: "{{ layer.type }}" }
+    {% endfor %}
+    ];
+
+    // base settings
+    var project_id = {{ project_id }};
+    var map_center = [{{ center_long }}, {{ center_lat }}];
+    var zoom_min = {{ zoom_min }};
+    var zoom_max = {{ zoom_max }};
+    var zoom_default = {{ zoom_default }};
+
+</script>
+
 <div id="map"></div>
 
-<form action=""> <!-- TODO: for what is this needed? -->
-    <input type="hidden" id="current_zoom" value="" />
-    <input type="hidden" id="current_view" value="" />
-    <input type="hidden" id="current_layer" value="" />
-</form>
-
+<!-- TODO: styles in css! -->
 <div style="background-color:#F4FCFF;width:100%">
     <div class="no-print" style="float:right; margin-right:80px;">
         <div class="fb-like" data-href="" data-width="450" data-layout="button_count" data-show-faces="true" data-send="true"></div>
