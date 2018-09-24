@@ -13,7 +13,7 @@
     {% for basemap in basemaps %}
         {% if not forloop.first %}, {% endif %}
         "{{ basemap.name }}": L.tileLayer("{{ basemap.url_string }}", {
-            attribution: "{{ basemap.attribution }}", subdomains: {{ basemap.subdomains }},
+            attribution: "{{ basemap.attribution }}", subdomains: "{{ basemap.subdomains }}",
             zoom_min: {{basemap.zoom_min}}, zoom_max: {{ basemap.zoom_max }},
             type: "{{ basemap.type }}"})
     {% endfor %}
@@ -26,6 +26,29 @@
         {id: {{ layer.id }}, name: "{{ layer.name }}", type: "{{ layer.type }}" }
     {% endfor %}
     ];
+    
+    var views = {
+    {% for layer, views1 in views.items %}
+    {% for view in views1 %}
+    {% if not forloop.first %}, {% endif %}
+    {{ view.id }}: {name: "{{ view.name }}", attribute: "{{ view.attribute.name }}", concurrents: {{ view.concurrents_as_json }}, layer: {{ layer.id }}, type: {{ view.signature_type }}, visible: {{ view.visible|lower }},
+        signatures: [
+            {% for view2, signature1 in signatures.items %}
+            {% if view2 == view %}
+                {% for signature in signature1  %}
+                {% if not forloop.first %}, {% endif %}
+                { {% if signature.label is not None %} label: "{{ signature.label }}",{% endif %}
+                {% if signature.stroke is not None %} weight: {{ signature.stroke }},{% endif %}
+                {% if signature.dash_array is not None %} dashArray: "{{ signature.dash_array }}",{% endif %}
+                {% if signature.rgb_color is not None %} color: "{{ signature.rgb_color }}",{% endif %}
+                values: {{ signature.values_as_json }}}
+                {% endfor %}
+            {% endif %}
+            {% endfor %}
+        ]}
+    {% endfor %}
+    {% endfor %}
+    }
 
     // base settings
     var project_id = {{ project_id }};
@@ -37,8 +60,7 @@
 </script>
 
 <div id="map"></div>
-
-<!-- TODO: styles in css! -->
+<!--
 <div style="background-color:#F4FCFF;width:100%">
     <div class="no-print" style="float:right; margin-right:80px;">
         <div class="fb-like" data-href="" data-width="450" data-layout="button_count" data-show-faces="true" data-send="true"></div>
@@ -47,5 +69,5 @@
 
 <div id="txtHint"></div>
 <div id="ScaleLine"></div>
-<div class="no-screen" id="printInfo">Think Spatial! {% trans "map:" %} {{ project_name }} | {% trans "created at:" %} {{ timestamp|localize }}</div>
+<div class="no-screen" id="printInfo">Think Spatial! {% trans "map:" %} {{ project_name }} | {% trans "created at:" %} {{ timestamp|localize }}</div>-->
 {% endblock %}

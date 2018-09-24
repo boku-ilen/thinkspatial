@@ -27,6 +27,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.3.5/jquery.fancybox.min.js"></script>
     <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.4/themes/base/jquery-ui.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href='{% url "stylecss" %}' />
-    <link rel="stylesheet" type="text/css" href='{%  static "css/thinkspatial.css" %}' />
-    <script type="text/javascript" src='{%  static "js/thinkspatial.js" %}'></script>
+    <link rel="stylesheet" type="text/css" href='{%  static "css/thinkspatial.css" %}?{% now "U" %}' />
+    <script type="text/javascript" src='{%  static "js/spare.js" %}?{% now "U" %}'></script>
 </head>

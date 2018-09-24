@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
+import json
 
 
 # common base class to include create, update and deletestamps
@@ -200,6 +201,16 @@ class AttributeValue(Base):
 
 
 class View(Base):
+    
+    SIGNATURE_TYPE_CHOICES = (
+        (1, "STROKE"),
+        (2, "WEIGHT"),
+        (3, "DASH_ARRAY"),
+        (4, "STROKE_WEIGHT"),
+        (5, "STROKE_DASH"),
+        (6, "WEIGHT_DASH"),
+        (7, "ALL")
+    )
 
     # the name of the predefined view
     name = models.TextField()
@@ -211,7 +222,22 @@ class View(Base):
     attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT)
 
     enabled = models.BooleanField(default=True)
-
+    
+    signature_type = models.PositiveIntegerField(choices=SIGNATURE_TYPE_CHOICES)
+    
+    # TODO: Constraints? Possible signature_type combinations:
+    # 1+2+3, 1+6, 2+5, 3+4, 7 
+    
+    concurrent_views = models.ManyToManyField("self", blank=True)
+    
+    visible = models.BooleanField(default=True)
+    
+    def concurrents_as_json(self):
+        js = json.dumps(list(self.concurrent_views.all().values_list("id")))
+        if len(js) > 2:
+            return js[1:-1]
+        else:
+            return js
 
 # represents an optional group of categories
 class Category_group(Base):
@@ -278,16 +304,43 @@ class Symbol(Base):
 
 # ..
 class Signature(Base):
+    
+    SIGNATURE_TYPE = (
+        (1, 'STRING'),
+        (2, 'INTEGER'),
+        (3, 'FLOAT'),
+    )
 
     # the associated predefined view
     view = models.ForeignKey(View, on_delete=models.PROTECT, related_name='+')
 
     # experimental: enumeration of associated values as string-encoded array
     values = models.TextField()
+    
+    # label to display -- translation?
+    label = models.TextField()
+    
+    # line weight ("WEIGHT")
+    stroke = models.IntegerField(null=True)
+    
+    # line dash array ("DASH")
+    dash_array = models.TextField(null=True)
 
-    # RRRGGGBBB
-    rgb_color = models.IntegerField()
+    # hex RRGGBB ("Stroke")
+    rgb_color = models.CharField(max_length=7, null=True)
 
+    # order
+    order = models.IntegerField(default=0)
+    
+    type = models.PositiveIntegerField(choices=SIGNATURE_TYPE)
+    
+    def values_as_json(self):
+        if self.type == 1:
+            return json.dumps(self.values.split(","))
+        elif self.type == 2:
+            return json.dumps([int(i) for i in self.values.split(",")])
+        elif self.type == 3:
+            return json.dumps([float(i) for i in self.values.split(",")])
 
 # a representation of an actor (participant, etc.)
 class Participant(Base):

@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.core import serializers
 from django.utils.translation import ugettext as _
 
-from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute
+from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute, Signature
 
 from PIL import Image
 import os
@@ -31,7 +31,12 @@ def index(request, template=None):
     layers = Layer.objects.filter(project=project, enabled=True)
     views = {}
     for layer in layers:
-        views[layer] = View.objects.filter(layer=layer)
+        views[layer] = View.objects.filter(layer=layer, enabled=True)
+        
+    signatures = {}
+    for layer, views1 in views.items():
+        for view in views1:
+            signatures[view] = Signature.objects.filter(view=view)
 
     # read center of the current project
     center = GEOSGeometry(project.center_wkt)
@@ -49,6 +54,7 @@ def index(request, template=None):
         'project_id': project.id,
         'layers': layers,
         'views': views,
+        'signatures': signatures,
         'basemaps': basemaps,
         'zoom_min': project.zoom_min,
         'zoom_max': project.zoom_max,
@@ -114,14 +120,14 @@ def poigetgeojson(request, layer):
         view_attributes = Attribute.objects.filter(view__layer=lyr, view__enabled=True)
 
         first = True
-        for geometry in geometries:
+        for i, geometry in enumerate(geometries):
 
             # get properties from all attributes which are referenced in prepared views
             prop = {}
             for attribute in view_attributes:
                 properties = AttributeValue.objects.filter(attribute=attribute)
                 if properties:
-                    prop[attribute.name] = properties[0].value
+                    prop[attribute.name] = properties[i].value
                 else:
                     prop[attribute.name] = None
 
