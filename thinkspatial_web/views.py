@@ -36,7 +36,7 @@ def index(request, template=None):
     signatures = {}
     for layer, views1 in views.items():
         for view in views1:
-            signatures[view] = Signature.objects.filter(view=view)
+            signatures[view] = Signature.objects.filter(view=view).order_by("order")
 
     # read center of the current project
     center = GEOSGeometry(project.center_wkt)

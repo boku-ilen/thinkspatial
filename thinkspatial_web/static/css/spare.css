@@ -12,7 +12,8 @@ div#map {
 div.legend {
   width: 25vw;
   border-radius: 5px;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(0, 0, 0, 0.2);
+  background: white;
 }
 div.legend div.legend-tabs {
   display: flex;
@@ -23,23 +24,24 @@ div.legend div.legend-tabs span {
   display: block;
   flex: auto 0 0;
   font: 14px/16px Arial, Helvetica, sans-serif;
+  background: #eee;
   padding: 6px 8px;
-  background: #eeeeee;
-  background: rgba(238, 238, 238, 0.8);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 div.legend div.legend-tabs span.active,
 div.legend div.legend-tabs span:hover {
   background: white;
-  background: rgba(255, 255, 255, 0.8);
   cursor: pointer;
 }
 div.legend div.legend-container {
   width: 100%;
   display: table;
-  background: white;
-  background: rgba(255, 255, 255, 0.8);
   box-sizing: border-box;
   padding: 0 1rem;
+}
+div.legend div.legend-container > span {
+  font: 14px/16px Arial, Helvetica, sans-serif;
 }
 div.legend div.legend-container div.signature {
   width: 100%;
