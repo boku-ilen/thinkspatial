@@ -6,12 +6,14 @@ from django.core import serializers
 from django.utils.translation import ugettext as _
 
 from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute, Signature
+from thinkspatial_web.custom_sqls import get_attributes
 
 from PIL import Image
 import os
 import logging
 import datetime
 import json
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -108,38 +110,52 @@ def poigetgeojson(request, layer):
 
     # check for a valid session and the current project
     # project = request.session.get("project")
+    start = time.time()
     lyr = Layer.objects.get(pk=layer)
 
-    response = '{'
+    #response = '{'
+    response = {"type": "FeatureCollection", "features": []};
     if lyr is not None:
 
-        response += '"type": "FeatureCollection", "features": ['
+        #response += '"type": "FeatureCollection", "features": ['
         # TODO: add crs?
 
+        print(time.time() - start)
         geometries = Geometry.objects.filter(layer=lyr) # , geom__within=boundingbox
-        view_attributes = Attribute.objects.filter(view__layer=lyr, view__enabled=True)
-
-        first = True
-        for i, geometry in enumerate(geometries):
-
+        print(time.time() - start)
+        attributes = get_attributes(lyr.id)
+        views = attributes[1]
+        attributes = attributes[0]
+        print(time.time() - start)
+        
+        #first = True
+        for index, geometry in enumerate(geometries):
+            feature = {"geometry": {}, "properties": {}, "type": "Feature"}
             # get properties from all attributes which are referenced in prepared views
-            prop = {}
+            #prop = {}
+            '''
             for attribute in view_attributes:
+                print(attribute)
                 properties = AttributeValue.objects.filter(attribute=attribute)
+                print(time.time() - start)
                 if properties:
-                    prop[attribute.name] = properties[i].value
+                    feature["properties"][attribute.name] = properties[i].value
                 else:
-                    prop[attribute.name] = None
+                    feature["properties"][attribute.name] = None
+            print(time.time() - start)'''
+            feature["properties"] = {attribute[0] : attribute[1] for attribute in attributes[index*views:index*views+views]}
+            feature["geometry"] = json.loads(geometry.geom.json)
+            response["features"].append(feature)
 
-            if not first:
-                response += ','
-            response += '{"type": "Feature", "geometry": ' + geometry.geom.json + ', "properties": ' + json.dumps(prop) + '}'
-            first = False
+            #if not first:
+            #    response += ','
+            #response += '{"type": "Feature", "geometry": ' + geometry.geom.json + ', "properties": ' + json.dumps(prop) + '}'
+            #first = False
 
-        response += "]"
-    response += '}'
-
-    return HttpResponse(response, content_type="application/geo+json")
+        #response += "]"
+    #response += '}'
+    print(time.time() - start)
+    return HttpResponse(json.dumps(response).replace('\\"', '\"'), content_type="application/geo+json")
 
 
 def symbolsvg(request, id, color, shadow=None):
