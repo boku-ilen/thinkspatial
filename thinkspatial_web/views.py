@@ -184,5 +184,7 @@ def newPOI(request, lat, long):
 def cluster(request):
     return None
 
+
+# returns the translation of a given key via json (for the mobile app)
 def getString(request, key):
     return HttpResponse(json.dumps({key: _(key)}), content_type="application/json")
