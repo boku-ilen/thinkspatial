@@ -105,55 +105,34 @@ def imgcolor(request):
     return response
 
 
-# returns a list of POIs
+# returns a list of POIs as geoJSON
 def poigetgeojson(request, layer):
 
     # check for a valid session and the current project
     # project = request.session.get("project")
+
     start = time.time()
     lyr = Layer.objects.get(pk=layer)
 
-    #response = '{'
-    response = {"type": "FeatureCollection", "features": []};
+    response = {"type": "FeatureCollection", "features": []}
     if lyr is not None:
 
-        #response += '"type": "FeatureCollection", "features": ['
         # TODO: add crs?
 
         print(time.time() - start)
-        geometries = Geometry.objects.filter(layer=lyr) # , geom__within=boundingbox
+        geometries = Geometry.objects.filter(layer=lyr)  # , geom__within=boundingbox
         print(time.time() - start)
         attributes = get_attributes(lyr.id)
         views = attributes[1]
         attributes = attributes[0]
-        print(time.time() - start)
-        
-        #first = True
+
+        # get geometry and properties from all attributes which are referenced in prepared views
         for index, geometry in enumerate(geometries):
-            feature = {"geometry": {}, "properties": {}, "type": "Feature"}
-            # get properties from all attributes which are referenced in prepared views
-            #prop = {}
-            '''
-            for attribute in view_attributes:
-                print(attribute)
-                properties = AttributeValue.objects.filter(attribute=attribute)
-                print(time.time() - start)
-                if properties:
-                    feature["properties"][attribute.name] = properties[i].value
-                else:
-                    feature["properties"][attribute.name] = None
-            print(time.time() - start)'''
-            feature["properties"] = {attribute[0] : attribute[1] for attribute in attributes[index*views:index*views+views]}
-            feature["geometry"] = json.loads(geometry.geom.json)
+            feature = {"geometry": json.loads(geometry.geom.json),
+                       "properties": {attribute[0]: attribute[1] for attribute in
+                                      attributes[index * views:index * views + views]}, "type": "Feature"}
             response["features"].append(feature)
 
-            #if not first:
-            #    response += ','
-            #response += '{"type": "Feature", "geometry": ' + geometry.geom.json + ', "properties": ' + json.dumps(prop) + '}'
-            #first = False
-
-        #response += "]"
-    #response += '}'
     print(time.time() - start)
     return HttpResponse(json.dumps(response).replace('\\"', '\"'), content_type="application/geo+json")
 
