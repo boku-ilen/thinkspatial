@@ -119,9 +119,9 @@ def poigetgeojson(request, layer):
 
         # TODO: add crs?
 
-        print(time.time() - start)
+        logger.debug("startup time: {}ms".format(time.time() - start))
         geometries = Geometry.objects.filter(layer=lyr)  # , geom__within=boundingbox
-        print(time.time() - start)
+        logger.debug("geometries load time: {}ms (suspected to be lazy loaded)".format(time.time() - start))
         attributes = get_attributes(lyr.id)
         views = attributes[1]
         attributes = attributes[0]
@@ -133,7 +133,7 @@ def poigetgeojson(request, layer):
                                       attributes[index * views:index * views + views]}, "type": "Feature"}
             response["features"].append(feature)
 
-    print(time.time() - start)
+    logger.debug("complete load time: {}ms".format(time.time() - start))
     return HttpResponse(json.dumps(response).replace('\\"', '\"'), content_type="application/geo+json")
 
 
