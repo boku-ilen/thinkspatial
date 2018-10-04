@@ -63,10 +63,10 @@ class Project(Base):
     location = models.TextField(default=None)
 
     # wkt representation of the default center of the project map
-    center_wkt = models.GeometryField(default=None)
+    center_wkt = models.TextField(default=None)
 
     # wkt representation of the maximum bounding box of the project map
-    bounding_wkt = models.GeometryField(default=None)
+    bounding_wkt = models.TextField(default=None)
 
     # the zoom settings of the project
     zoom_default = models.PositiveIntegerField(default=5)
@@ -223,8 +223,7 @@ class View(Base):
 
     enabled = models.BooleanField(default=True)
     
-    signature_type = models.PositiveIntegerField(choices=SIGNATURE_TYPE_CHOICES)
-    
+    signature_type = models.PositiveIntegerField(choices=SIGNATURE_TYPE_CHOICES, default=1)
     # TODO: Constraints? Possible signature_type combinations:
     # 1+2+3, 1+6, 2+5, 3+4, 7 
     
@@ -238,6 +237,7 @@ class View(Base):
             return js[1:-1]
         else:
             return js
+
 
 # represents an optional group of categories
 class Category_group(Base):
@@ -318,7 +318,7 @@ class Signature(Base):
     values = models.TextField()
     
     # label to display -- translation?
-    label = models.TextField()
+    label = models.TextField(default="<empty>")
     
     # line weight ("WEIGHT")
     stroke = models.IntegerField(null=True)
@@ -332,7 +332,7 @@ class Signature(Base):
     # order
     order = models.IntegerField(default=0)
     
-    type = models.PositiveIntegerField(choices=SIGNATURE_TYPE)
+    type = models.PositiveIntegerField(choices=SIGNATURE_TYPE, default=1)
     
     def values_as_json(self):
         if self.type == 1:
@@ -341,6 +341,7 @@ class Signature(Base):
             return json.dumps([int(i) for i in self.values.split(",")])
         elif self.type == 3:
             return json.dumps([float(i) for i in self.values.split(",")])
+
 
 # a representation of an actor (participant, etc.)
 class Participant(Base):
