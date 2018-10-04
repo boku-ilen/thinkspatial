@@ -113,11 +113,13 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
+# prefix for URL references where the project is not deployed at a root node (eg. /thinkspatial)
+ROOT_URL = '/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
-STATIC_URL = '/static/'
+STATIC_URL = ROOT_URL + 'static/'
 
 # for now we do not have login and logout info pages
-LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = ROOT_URL + '/'
+LOGOUT_REDIRECT_URL = ROOT_URL + '/'
