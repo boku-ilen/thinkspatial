@@ -24,7 +24,7 @@ def index(request, template=None):
     # get the default project if there is no project defined in the session yet
     project = request.session.get("project")
     if project is None:
-        project = Project.objects.get(pk=13)  # FIXME: how to determine default project
+        project = Project.objects.first()  # TODO: configure which project to show by default
 
     # get the associated basemaps
     basemaps = project.basemaps.all()
