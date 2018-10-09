@@ -166,6 +166,7 @@ function updateStyles(type, attribute, signatures) {
                     style["dash-array"] = signature.dashArray;
                     break;
             }
+            style.stroke = true;
             l.setStyle(style);
         } else {
             l.setStyle({stroke: false});
