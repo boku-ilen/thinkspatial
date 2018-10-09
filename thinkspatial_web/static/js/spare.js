@@ -7,12 +7,12 @@ $(document).ready(function () {
 });
 
 function initLeaflet() {
-
     map = L.map('map', {
         center: map_center,
         zoom: zoom_default,
         minZoom: zoom_min,
-        maxZoom: zoom_max
+        maxZoom: zoom_max,
+        renderer: L.canvas()
     });
 
     // add default basemap to map and add all defined basemaps to the layer control widget
@@ -34,8 +34,6 @@ function initLeaflet() {
         layer_control.addTo(map);
     }
 
-    initLegend();
-
     /*
      // ADD CLICK FUNCTION
      //TODO: add it only if edit permissions are granted
@@ -50,12 +48,6 @@ function initLeaflet() {
 
 function initGeoJSON(data) {
     geojson = L.geoJson(data, {
-        /*style: function (feature) {
-         return {
-         color: "#" + feature.properties.color
-         };
-         },*/
-
         pointToLayer: function (feature, latlng) {
             var iconSize = Math.round(feature.properties.size / 1);
             var smallIcon = L.icon({
@@ -74,6 +66,7 @@ function initGeoJSON(data) {
     }).addTo(map);
 
     map.fitBounds(geojson.getBounds());
+    initLegend();
 }
 
 function initLegend() {
@@ -93,6 +86,8 @@ function initLegend() {
     };
 
     legend.addTo(map);
+    
+    $("div.legend div.legend-tabs span").first().click();
 }
 
 function updateLegend(e) {
@@ -104,16 +99,16 @@ function updateLegend(e) {
 
     $("div.legend-tabs .active").removeClass("active");
     $(this).addClass("active");
-    
+
     $("div.legend-tabs").nextAll().remove();
 
     $.each(_views, function (i, view) {
-        
+
         $legendContainer = $("<div>").addClass("legend-container");
         if (i > 0) {
-                $legendContainer.append($("<span>").text(view.name));
-            }
-        
+            $legendContainer.append($("<span>").text(view.name));
+        }
+
         $.each(view.signatures, function (i, signature) {
             $key = $("<div>").addClass("signature").append($("<span>").html(signature.label));
             $legendContainer.append($key);
@@ -130,7 +125,16 @@ function updateStyles(type, attribute, signatures) {
     geojson.eachLayer(function (l) {
         var props = l.feature.properties, style = {};
         var signature = signatures.filter(function (sig) {
-            return sig.values.indexOf(props[attribute]) > -1;
+            if (typeof sig.values[0] === "string") {
+                return sig.values.indexOf(props[attribute]) > -1;
+            } else if (typeof sig.values[0] === "number") {
+                if (sig.values.length === 1) {
+                    //console.log(sig.values);
+                    return sig.values.indexOf(Number(props[attribute])) > -1;
+                } else {
+                    return sig.values[0] <= Number(props[attribute]) && Number(props[attribute]) <= sig.values[1];
+                }
+            }
         })[0];
 
         if (signature) {
@@ -160,13 +164,12 @@ function updateStyles(type, attribute, signatures) {
                     style.color = signature.color;
                     style.weight = signature.weight;
                     style["dash-array"] = signature.dashArray;
-                    break; 
+                    break;
             }
+            style.stroke = true;
             l.setStyle(style);
         } else {
-            console.log(attribute)
-            console.log(props[attribute]);
-            l.setStyle({color: "grey"});
+            l.setStyle({stroke: false});
         }
 
     });
@@ -174,8 +177,28 @@ function updateStyles(type, attribute, signatures) {
 
 function getLayers() {
     layers.forEach(function (layer) {
-        $.getJSON("/ajax/" + layer.id + "/layer.geojson", function (data) {
-            initGeoJSON(data);
+        $.ajax("/ajax/" + layer.id + "/layer.geojson", {
+            xhr: function () {
+                var xhr = new XMLHttpRequest();
+                var progress = setInterval(function () {
+                    if ($("progress").val() <= 50) {
+                        $("progress").val($("progress").val() + 0.5);
+                    }
+                }, 500);
+
+                xhr.addEventListener("progress", function (e) {
+                    clearInterval(progress);
+                    $("progress").val(50 + e.loaded / e.total / 2 * 100);
+                }, false);
+
+                return xhr;
+            },
+            method: "get",
+            dataType: "json",
+            success: function (data) {
+                initGeoJSON(data);
+                $(".disclaimer-modal").hide();
+            }
         });
     });
 }
