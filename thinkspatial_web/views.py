@@ -120,7 +120,7 @@ def poigetgeojson(request, layer):
         # TODO: add crs?
 
         logger.debug("startup time: {}ms".format(time.time() - start))
-        geometries = Geometry.objects.filter(layer=lyr)  # , geom__within=boundingbox
+        geometries = Geometry.objects.filter(layer=lyr).order_by("id")  # , geom__within=boundingbox
         logger.debug("geometries load time: {}ms (suspected to be lazy loaded)".format(time.time() - start))
         attributes = get_attributes(lyr.id)
         views = attributes[1]

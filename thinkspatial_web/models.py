@@ -315,7 +315,8 @@ class Signature(Base):
     view = models.ForeignKey(View, on_delete=models.PROTECT, related_name='+')
 
     # experimental: enumeration of associated values as string-encoded array
-    values = models.TextField()
+    min_value = models.TextField()
+    max_value = models.TextField(null=True)
     
     # label to display -- translation?
     label = models.TextField(default="<empty>")
@@ -335,12 +336,15 @@ class Signature(Base):
     type = models.PositiveIntegerField(choices=SIGNATURE_TYPE, default=1)
     
     def values_as_json(self):
+        values = [self.min_value]
+        if self.max_value:
+            values.append(self.max_value)
         if self.type == 1:
-            return json.dumps(self.values.split(","))
+            return json.dumps(values)
         elif self.type == 2:
-            return json.dumps([int(i) for i in self.values.split(",")])
+            return json.dumps([int(i) for i in values])
         elif self.type == 3:
-            return json.dumps([float(i) for i in self.values.split(",")])
+            return json.dumps([float(i) for i in values])
 
 
 # a representation of an actor (participant, etc.)
