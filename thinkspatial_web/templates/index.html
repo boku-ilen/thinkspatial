@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<script>
+<script language="JavaScript">
     // CONFIGURE THINKSPATIAL LEAFLET COMPONENT
 
     // write basemaps into a javascript array
@@ -51,11 +51,11 @@
     }
 
     // base settings
-    var project_id = {{ project_id }};
-    var map_center = [{{ center_long }}, {{ center_lat }}];
-    var zoom_min = {{ zoom_min }};
-    var zoom_max = {{ zoom_max }};
-    var zoom_default = {{ zoom_default }};
+    project_id = {{ project_id }};
+    map_center = [{{ center_long }}, {{ center_lat }}];
+    zoom_min = {{ zoom_min }};
+    zoom_max = {{ zoom_max }};
+    zoom_default = {{ zoom_default }};
 
 </script>
 
