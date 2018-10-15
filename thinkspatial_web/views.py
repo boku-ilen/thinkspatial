@@ -65,6 +65,7 @@ def index(request, template=None):
         'center_lat': center.y,
         'project_name': project.name,
         'project_info': project.info,
+        'project_disclaimer': project.disclaimer,
         'timestamp': datetime.datetime.now(),
         'template': request.session["template"],
     }
