@@ -32,3 +32,6 @@ USE_TZ = True
 
 # prefix for URL references where the project is not deployed at a root node (eg. /thinkspatial)
 ROOT_URL = '/'
+
+# set the default template style if applicable
+DEFAULT_TEMPLATE = 'old'

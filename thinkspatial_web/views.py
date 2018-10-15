@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.core import serializers
+from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute, Signature
@@ -49,7 +49,7 @@ def index(request, template=None):
         request.session["template"] = template
     else:
         if "template" not in request.session:
-            request.session["template"] = "old"  # set default template
+            request.session["template"] = settings.DEFAULT_TEMPLATE  # set default template
 
     context = {
         'user': request.user,
