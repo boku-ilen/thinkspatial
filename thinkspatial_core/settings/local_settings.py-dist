@@ -35,3 +35,6 @@ ROOT_URL = '/'
 
 # set the default template style if applicable
 DEFAULT_TEMPLATE = 'old'
+
+# set the default project to be displayed
+DEFAULT_PROJECT = 10

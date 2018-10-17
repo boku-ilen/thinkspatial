@@ -24,7 +24,11 @@ def index(request, template=None):
     # get the default project if there is no project defined in the session yet
     project = request.session.get("project")
     if project is None:
-        project = Project.objects.first()  # TODO: configure which project to show by default
+        # if there is a django settings variable pointing to a valid project use it if not take the first available
+        if settings.DEFAULT_PROJECT:
+            project = Project.objects.get(pk=settings.DEFAULT_PROJECT)
+        if project is None:
+            project = Project.objects.first()
 
     # get the associated basemaps
     basemaps = project.basemaps.all()
