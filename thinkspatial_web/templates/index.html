@@ -20,15 +20,16 @@
     };
 
     // write layer information into a javascript array
-    var layers = [
+    var layers = {
     {% for layer in layers %}
         {% if not forloop.first %}, {% endif %}
-        {id: {{ layer.id }}, name: "{{ layer.name }}", type: "{{ layer.type }}" }
+        {{ layer.id }}: {name: "{{ layer.name }}", type: "{{ layer.type }}" }
     {% endfor %}
-    ];
+    };
     
     var views = {
     {% for layer, views1 in views.items %}
+    {% if not forloop.first %}, {% endif %}
     {% for view in views1 %}
     {% if not forloop.first %}, {% endif %}
     {{ view.id }}: {name: "{{ view.name }}", attribute: "{{ view.attribute.name }}", concurrents: {{ view.concurrents_as_json }}, layer: {{ layer.id }}, type: {{ view.signature_type }}, visible: {{ view.visible|lower }},
@@ -40,12 +41,16 @@
                 { {% if signature.label is not None %} label: "{{ signature.label }}",{% endif %}
                 {% if signature.stroke is not None %} weight: {{ signature.stroke }},{% endif %}
                 {% if signature.dash_array is not None %} dashArray: "{{ signature.dash_array }}",{% endif %}
-                {% if signature.rgb_color is not None %} color: "{{ signature.rgb_color }}",{% endif %}
-                values: {{ signature.values_as_json }}}
+                {% if signature.stroke_color is not None %} color: "{{ signature.stroke_color }}",{% endif %}
+                {% if signature.stroke_opacity is not None %} opacity: "{{ signature.stroke_opacity }}",{% endif %}
+                {% if signature.fill_color is not None %} fillColor: "{{ signature.fill_color }}",{% endif %}
+                {% if signature.fill_opacity is not None %} fillOpacity: {{ signature.fill_opacity }},{% endif %}
+                {% if signature.array is not None %} array: {{ signature.array | lower }},{% endif %}
+                values: {{ signature.values_as_json | safe }}}
                 {% endfor %}
             {% endif %}
             {% endfor %}
-        ]}
+        ], defaultView: {{ view.default | lower }}}
     {% endfor %}
     {% endfor %}
     }

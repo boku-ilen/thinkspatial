@@ -209,7 +209,15 @@ class View(Base):
         (4, "STROKE_WEIGHT"),
         (5, "STROKE_DASH"),
         (6, "WEIGHT_DASH"),
-        (7, "ALL")
+        (7, "STROKE_WEIGTH_DASH"),
+        (8, "FILL"),
+        (9, "FILL_STROKE"),
+        (10, "FILL_WEIGHT"),
+        (11, "FILL_DASH"),
+        (12, "FILL_STROKE_WEIGHT"),
+        (13, "FILL_STROKE_DASH"),
+        (14, "FILL_WEIGHT_DASH"),
+        (15, "ALL")
     )
 
     # the name of the predefined view
@@ -222,6 +230,8 @@ class View(Base):
     attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT)
 
     enabled = models.BooleanField(default=True)
+    
+    default = models.BooleanField(default=False)
     
     signature_type = models.PositiveIntegerField(choices=SIGNATURE_TYPE_CHOICES, default=1)
     # TODO: Constraints? Possible signature_type combinations:
@@ -328,23 +338,40 @@ class Signature(Base):
     dash_array = models.TextField(null=True)
 
     # hex RRGGBB ("Stroke")
-    rgb_color = models.CharField(max_length=7, null=True)
+    stroke_color = models.CharField(max_length=7, null=True)
+    
+    fill_color = models.CharField(max_length=7, null=True)
 
     # order
     order = models.IntegerField(default=0)
     
     type = models.PositiveIntegerField(choices=SIGNATURE_TYPE, default=1)
     
+    array = models.BooleanField(default=False)
+    
+    fill_opacity = models.FloatField(null=True)
+    
+    stroke_opacity = models.FloatField(null=True)
+    
     def values_as_json(self):
         values = [self.min_value]
         if self.max_value:
             values.append(self.max_value)
         if self.type == 1:
-            return json.dumps(values)
+            if self.array:
+                return json.dumps(self.min_value.split(","))
+            else:
+                return json.dumps(values)
         elif self.type == 2:
-            return json.dumps([int(i) for i in values])
+            if self.array:
+                return json.dumps([int(i) for i in self.min_value.split(",")])
+            else:
+                return json.dumps([int(i) for i in values])
         elif self.type == 3:
-            return json.dumps([float(i) for i in values])
+            if self.array:
+                return json.dumps([float(i) for i in self.min_value.split(",")])
+            else:
+                return json.dumps([float(i) for i in values])
 
 
 # a representation of an actor (participant, etc.)
