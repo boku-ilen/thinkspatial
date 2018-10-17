@@ -2,7 +2,7 @@ from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
 from django.shortcuts import render
 from django.http import HttpResponse
-from django.core import serializers
+from django.conf import settings
 from django.utils.translation import ugettext as _
 
 from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute, Signature
@@ -24,7 +24,7 @@ def index(request, template=None):
     # get the default project if there is no project defined in the session yet
     project = request.session.get("project")
     if project is None:
-        project = Project.objects.get(pk=13)  # FIXME: how to determine default project
+        project = Project.objects.first()  # TODO: configure which project to show by default
 
     # get the associated basemaps
     basemaps = project.basemaps.all()
@@ -49,7 +49,7 @@ def index(request, template=None):
         request.session["template"] = template
     else:
         if "template" not in request.session:
-            request.session["template"] = "old"  # set default template
+            request.session["template"] = settings.DEFAULT_TEMPLATE  # set default template
 
     context = {
         'user': request.user,
@@ -65,6 +65,7 @@ def index(request, template=None):
         'center_lat': center.y,
         'project_name': project.name,
         'project_info': project.info,
+        'project_disclaimer': project.disclaimer,
         'timestamp': datetime.datetime.now(),
         'template': request.session["template"],
     }

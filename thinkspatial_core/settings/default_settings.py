@@ -13,22 +13,18 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 import mimetypes
 
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
+
 # fixes development bug?
 mimetypes.add_type("text/css", ".css", True)
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'development'
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 # Application definition
@@ -87,22 +83,13 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator', },
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator', },
 ]
 
 # Internationalization
@@ -123,3 +110,6 @@ STATIC_URL = ROOT_URL + 'static/'
 # for now we do not have login and logout info pages
 LOGIN_REDIRECT_URL = ROOT_URL + '/'
 LOGOUT_REDIRECT_URL = ROOT_URL + '/'
+
+# default template style is currently old
+DEFAULT_TEMPLATE = "old"

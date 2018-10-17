@@ -54,6 +54,9 @@ class Project(Base):
     # the homepage of the project
     homepage = models.TextField(default=None)
 
+    # the optional disclaimer text displayed the first time loading the map
+    disclaimer = models.TextField(default=None, null=True)
+
     #TODO: header?
 
     # the project icon
@@ -325,8 +328,8 @@ class Signature(Base):
     view = models.ForeignKey(View, on_delete=models.PROTECT, related_name='+')
 
     # experimental: enumeration of associated values as string-encoded array
-    min_value = models.TextField()
-    max_value = models.TextField(null=True)
+    min_value = models.TextField(default=0)
+    max_value = models.TextField(null=True, default=0)
     
     # label to display -- translation?
     label = models.TextField(default="<empty>")

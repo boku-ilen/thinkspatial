@@ -5,7 +5,7 @@
 
 {% block content %}
 
-<script>
+<script language="JavaScript">
     // CONFIGURE THINKSPATIAL LEAFLET COMPONENT
 
     // write basemaps into a javascript array
@@ -56,22 +56,28 @@
     }
 
     // base settings
-    var project_id = {{ project_id }};
-    var map_center = [{{ center_long }}, {{ center_lat }}];
-    var zoom_min = {{ zoom_min }};
-    var zoom_max = {{ zoom_max }};
-    var zoom_default = {{ zoom_default }};
+    project_id = {{ project_id }};
+    map_center = [{{ center_long }}, {{ center_lat }}];
+    zoom_min = {{ zoom_min }};
+    zoom_max = {{ zoom_max }};
+    zoom_default = {{ zoom_default }};
 
 </script>
 
+<!-- displaying an overlay disclaimer and load screen if applicable -->
+<!-- TODO: disable/enable based on project and/or deployment settings -->
 <div class="disclaimer-modal">
     <div class="disclaimer">
-        <p>Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.</p>
+        {% if project_disclaimer %}
+        <p>{{ project_disclaimer }}</p>
+        {% endif %}
         <progress value="0" max="100"></progress>
     </div>
 </div>
 
+<!-- displaying the main map component -->
 <div id="map"></div>
+
 <!--
 <div style="background-color:#F4FCFF;width:100%">
     <div class="no-print" style="float:right; margin-right:80px;">
