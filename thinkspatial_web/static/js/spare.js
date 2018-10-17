@@ -17,7 +17,7 @@ function getLayerbyID(id) {
 function getLayers() {
     var i = 1;
     $.each(layers, function (id, layer) {
-        $.ajax("/ajax/" + id + "/layer.geojson", {
+        $.ajax(root_url + "/ajax/" + id + "/layer.geojson", {
             xhr: function () {
                 var xhr = new XMLHttpRequest();
                 var progress = setInterval(function () {
@@ -68,7 +68,7 @@ function initGeoJSON(layer, data) {
         pointToLayer: function (feature, latlng) {
             var iconSize = Math.round(feature.properties.size / 1);
             var smallIcon = L.icon({
-                iconUrl: "images_dyn/symbol_svg_ID.php?ID=" + feature.properties.symbol + "&C=" + feature.properties.color + "&shadow=0.5",
+                iconUrl: root_url + "/images_dyn/symbol_svg_ID.php?ID=" + feature.properties.symbol + "&C=" + feature.properties.color + "&shadow=0.5",
                 iconSize: [iconSize, iconSize], // size of the icon
                 iconAnchor: [iconSize / 2, iconSize / 2], // point of the icon which will correspond to marker's location
                 popupAnchor: [0, -1 * (iconSize / 2)] // point from which the popup should open relative to the iconAnchor

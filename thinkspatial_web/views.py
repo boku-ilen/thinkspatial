@@ -72,6 +72,7 @@ def index(request, template=None):
         'project_disclaimer': project.disclaimer,
         'timestamp': datetime.datetime.now(),
         'template': request.session["template"],
+        'root_url': settings.ROOT_URL,
     }
 
     return render(request, "index.html", context)
