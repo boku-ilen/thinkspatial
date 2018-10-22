@@ -8,16 +8,20 @@ $(document).ready(function () {
 
 function getLayerbyID(id) {
     var layerName = layers[id].name;
-    var layer = layerControl._layers.filter(function (layer) {
-        return layer.name === layerName && layer.overlay;
-    })[0].layer;
-    return layer;
+    try {
+        var layer = layerControl._layers.filter(function (layer) {
+            return layer.name === layerName && layer.overlay;
+        })[0].layer;
+        return layer;
+    } catch (e) {
+        return L.layerGroup();
+    }
 }
 
 function getLayers() {
     var i = 1;
     $.each(layers, function (id, layer) {
-        $.ajax(root_url + "/ajax/" + id + "/layer.geojson", {
+        $.ajax(root_url + "ajax/" + id + "/layer.geojson", {
             xhr: function () {
                 var xhr = new XMLHttpRequest();
                 var progress = setInterval(function () {
@@ -37,6 +41,14 @@ function getLayers() {
             dataType: "json",
             success: function (data) {
                 initGeoJSON(layer, data);
+                if (i === Object.keys(layers).length) {
+                    initLegend();
+                    $(".disclaimer-modal").hide();
+                } else {
+                    i++;
+                }
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
                 if (i === Object.keys(layers).length) {
                     initLegend();
                     $(".disclaimer-modal").hide();
@@ -68,7 +80,7 @@ function initGeoJSON(layer, data) {
         pointToLayer: function (feature, latlng) {
             var iconSize = Math.round(feature.properties.size / 1);
             var smallIcon = L.icon({
-                iconUrl: root_url + "/images_dyn/symbol_svg_ID.php?ID=" + feature.properties.symbol + "&C=" + feature.properties.color + "&shadow=0.5",
+                iconUrl: root_url + "images_dyn/symbol_svg_ID.php?ID=" + feature.properties.symbol + "&C=" + feature.properties.color + "&shadow=0.5",
                 iconSize: [iconSize, iconSize], // size of the icon
                 iconAnchor: [iconSize / 2, iconSize / 2], // point of the icon which will correspond to marker's location
                 popupAnchor: [0, -1 * (iconSize / 2)] // point from which the popup should open relative to the iconAnchor
@@ -116,7 +128,7 @@ function initLegend() {
     };
 
     legend.addTo(map);
-    
+
     initDefaultViews();
 }
 
@@ -128,6 +140,10 @@ function initDefaultViews() {
             updateStyles(getLayerbyID(view.layer), view.type, view.attribute, view.signatures, 0);
         }
     });
+}
+
+function rem2px(rem) {
+    return parseInt(window.getComputedStyle(document.documentElement)["font-size"]) * rem;
 }
 
 function resetStroke() {
@@ -159,7 +175,7 @@ function updateLegend() {
             $key = $("<div>").addClass("signature").append($("<span>").html(signature.label));
             $legendContainer.append($key);
             $(".legend").append($legendContainer);
-            var svg = d3.select(".legend-container:last-child div.signature:last-child").insert("svg", ":first-child").attr("width", "4rem").attr("height", "2rem").attr("viewBox", "0 0 32 16");
+            var svg = d3.select(".legend-container:last-child div.signature:last-child").insert("svg", ":first-child").attr("width", rem2px(4)).attr("height", rem2px(2)).attr("viewBox", "0 0 32 16");
             svg.append("line").attr("x1", 0).attr("x2", 32).attr("y1", 8).attr("y2", 8).attr("stroke-width", signature.weight).attr("stroke", signature.color);
         });
 
@@ -170,7 +186,7 @@ function updateLegend() {
 function updateStyles(layer, type, attribute, signatures, i) {
     layer.eachLayer(function (l) {
         var props = l.feature.properties, style = {};
-        var signature = signatures.filter(function (sig) {
+        var layerSignatures = signatures.filter(function (sig) {
             if (typeof sig.values[0] === "string") {
                 return sig.values.indexOf(props[attribute]) > -1;
             } else if (typeof sig.values[0] === "number") {
@@ -180,37 +196,44 @@ function updateStyles(layer, type, attribute, signatures, i) {
                     return sig.values[0] <= Number(props[attribute]) && Number(props[attribute]) <= sig.values[1];
                 }
             }
-        })[0];
+        });
 
-        if (signature) {
-            if ([1, 4, 5, 7, 9, 12, 13, 15].indexOf(type) >= 0) {
-                style.color = signature.color;
-                if (typeof signature.opacity !== "undefined") {
-                    style.opacity = signature.opacity;
+        if (signatures.length > 0) {
+            $.each(layerSignatures, function (j, signature) {
+                if ([1, 4, 5, 7, 9, 12, 13, 15].indexOf(type) >= 0) {
+                    style.color = signature.color;
+                    if (typeof signature.opacity !== "undefined") {
+                        style.opacity = signature.opacity;
+                    }
                 }
-            }
-            
-            if ([2, 4, 6, 7, 10, 12, 14, 15].indexOf(type) >= 0) {
-                style.weight = signature.weight;
-            }
-            
-            if ([3, 5, 6, 7, 11, 13, 14, 15].indexOf(type) >= 0) {
-                style["dash-array"] = signature.dashArray;
-            }
-            
-            if ([8, 9, 10, 11, 12, 13, 14, 15].indexOf(type) >= 0) {
-                style.fillColor = signature.fillColor;
-                if (typeof signature.fillOpacity !== "undefined") {
-                    style.fillOpacity = signature.fillOpacity;
+
+                if ([2, 4, 6, 7, 10, 12, 14, 15].indexOf(type) >= 0) {
+                    style.weight = signature.weight;
                 }
-            }
-            
-            if (i === 0) {
-                style.stroke = true;
-            } else {
-                style.stroke = l.options.stroke && true;
-            }
-            l.setStyle(style);
+
+                if ([3, 5, 6, 7, 11, 13, 14, 15].indexOf(type) >= 0) {
+                    style["dash-array"] = signature.dashArray;
+                }
+
+                if ([8, 9, 10, 11, 12, 13, 14, 15].indexOf(type) >= 0) {
+                    style.fillColor = signature.fillColor;
+                    if (typeof signature.fillOpacity !== "undefined") {
+                        style.fillOpacity = signature.fillOpacity;
+                    }
+                }
+
+                if (i === 0) {
+                    style.stroke = true;
+                } else {
+                    style.stroke = l.options.stroke && true;
+                }
+
+                if (j === 0) {
+                    l.setStyle(style);
+                } else if (signature.hover) {
+                    //TODO
+                }
+            });
         } else {
             l.setStyle({stroke: false});
         }
