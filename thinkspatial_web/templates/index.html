@@ -46,6 +46,7 @@
                 {% if signature.fill_color is not None %} fillColor: "{{ signature.fill_color }}",{% endif %}
                 {% if signature.fill_opacity is not None %} fillOpacity: {{ signature.fill_opacity }},{% endif %}
                 {% if signature.array is not None %} array: {{ signature.array | lower }},{% endif %}
+                {% if signature.hover is not None %} hover: {{ signature.hover | lower }},{% endif %}
                 values: {{ signature.values_as_json | safe }}}
                 {% endfor %}
             {% endif %}

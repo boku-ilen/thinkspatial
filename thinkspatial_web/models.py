@@ -357,6 +357,8 @@ class Signature(Base):
     
     stroke_opacity = models.FloatField(null=True)
     
+    hover = models.BooleanField(default=False)
+    
     def values_as_json(self):
         values = [self.min_value]
         if self.max_value:
@@ -425,3 +427,24 @@ class Category(Base):
 
     # the graphical representation of the category (optional)
     symbol = models.ForeignKey(Symbol, on_delete=models.PROTECT, related_name='+')
+
+#
+class Statistic(Base):
+    DIAGRAM_TYPE = (
+        (1, "Bar Chart"), # Balkendiagramm
+    )
+    
+    # diagram type
+    type = models.PositiveIntegerField(choices=DIAGRAM_TYPE)
+    
+    # display absolute or relative values - default relative
+    absolute = models.BooleanField(default=False)
+    
+    # attribute to analyse
+    attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="attribute")
+
+    # group by an attribute
+    group_by_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="group_by")
+    
+    # attribute of another layer to display stats when hovering/clicking
+    join_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="join", null=True)
