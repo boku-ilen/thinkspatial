@@ -349,7 +349,8 @@ class Signature(Base):
     order = models.IntegerField(default=0)
     
     type = models.PositiveIntegerField(choices=SIGNATURE_TYPE, default=1)
-    
+
+    # flags if multiple values are stored in the (min_)value field and have to be extracted first
     array = models.BooleanField(default=False)
     
     fill_opacity = models.FloatField(null=True)
