@@ -60,6 +60,18 @@ function getLayers() {
     });
 }
 
+function getStyle(layer) {
+    var style = $.extend(true, {}, layer.options);
+    delete style.attribution;
+    delete style.bubblingMouseEvents;
+    delete style.interactive;
+    delete style.onEachFeature;
+    delete style.pane;
+    delete style.pointToLayer;
+    
+    return style;
+}
+
 function initLeaflet() {
     map = L.map('map', {
         center: map_center,
@@ -198,7 +210,7 @@ function updateStyles(layer, type, attribute, signatures, i) {
             }
         });
 
-        if (signatures.length > 0) {
+        if (layerSignatures.length > 0) {
             $.each(layerSignatures, function (j, signature) {
                 if ([1, 4, 5, 7, 9, 12, 13, 15].indexOf(type) >= 0) {
                     style.color = signature.color;
@@ -231,7 +243,14 @@ function updateStyles(layer, type, attribute, signatures, i) {
                 if (j === 0) {
                     l.setStyle(style);
                 } else if (signature.hover) {
-                    //TODO
+                    l.on("mouseover", function() {
+                        var originalStyle = getStyle(l);
+                        l.setStyle(style);
+                        
+                        l.on("mouseout", function() {
+                            l.setStyle(originalStyle);
+                        });
+                    });
                 }
             });
         } else {

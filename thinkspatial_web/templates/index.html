@@ -42,7 +42,7 @@
                 {% if signature.stroke is not None %} weight: {{ signature.stroke }},{% endif %}
                 {% if signature.dash_array is not None %} dashArray: "{{ signature.dash_array }}",{% endif %}
                 {% if signature.stroke_color is not None %} color: "{{ signature.stroke_color }}",{% endif %}
-                {% if signature.stroke_opacity is not None %} opacity: "{{ signature.stroke_opacity }}",{% endif %}
+                {% if signature.stroke_opacity is not None %} opacity: {{ signature.stroke_opacity }},{% endif %}
                 {% if signature.fill_color is not None %} fillColor: "{{ signature.fill_color }}",{% endif %}
                 {% if signature.fill_opacity is not None %} fillOpacity: {{ signature.fill_opacity }},{% endif %}
                 {% if signature.array is not None %} array: {{ signature.array | lower }},{% endif %}

@@ -99,6 +99,9 @@ urlpatterns = [
 
     # get the poi geometries
     url(r'^ajax/(?P<layer>[a-zA-Z0-9]+)/layer.geojson', views.poigetgeojson, name="poigetgeojson"),
+    
+    # get statistic json
+    url(r'^ajax/(?P<statistic>[0-9]+)/stat.json', views.get_statistic, name="get_statistic"),
 
     # post the cluster data
     url(r'^ajax/cluster', views.cluster, name="ajax_cluster"),

@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
+from thinkspatial_web.custom_sqls import get_statistics
 import json
 
 
@@ -448,3 +449,7 @@ class Statistic(Base):
     
     # attribute of another layer to display stats when hovering/clicking
     join_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="join", null=True)
+    
+    def get_json(self):
+        stats = get_statistics(self.attribute.id, self.group_by_attribute.id)
+        print(stats)

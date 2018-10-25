@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.utils.translation import ugettext as _
 
-from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute, Signature
+from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute, Signature, Statistic
 from thinkspatial_web.custom_sqls import get_attributes
 
 from PIL import Image
@@ -126,9 +126,9 @@ def poigetgeojson(request, layer):
         # TODO: add crs?
 
         logger.debug("startup time: {}ms".format(time.time() - start))
-        geometries = Geometry.objects.filter(layer=lyr).order_by("id")#[0:500]  # , geom__within=boundingbox
+        geometries = Geometry.objects.filter(layer=lyr).order_by("id")[0:500]  # , geom__within=boundingbox
         logger.debug("geometries load time: {}ms (suspected to be lazy loaded)".format(time.time() - start))
-        attributes = get_attributes(lyr.id)#[0:500]
+        attributes = get_attributes(lyr.id)[0:500]
         views = attributes[1]
         attributes = attributes[0]
 
@@ -189,3 +189,9 @@ def cluster(request):
 # returns the translation of a given key via json (for the mobile app)
 def getString(request, key):
     return HttpResponse(json.dumps({key: _(key)}), content_type="application/json")
+
+# returns json for given statistic id
+def get_statistic(request, statistic):
+    stat = Statistic.objects.get(pk=statistic)
+    stat.get_json()
+    return HttpResponse(statistic, content_type="application/json")
