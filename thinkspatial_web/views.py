@@ -193,5 +193,4 @@ def getString(request, key):
 # returns json for given statistic id
 def get_statistic(request, statistic):
     stat = Statistic.objects.get(pk=statistic)
-    stat.get_json()
-    return HttpResponse(statistic, content_type="application/json")
+    return HttpResponse(stat.get_json(), content_type="application/json")

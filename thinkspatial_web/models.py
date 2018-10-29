@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
-from thinkspatial_web.custom_sqls import get_statistics
 import json
+import time
 
 
 # common base class to include create, update and deletestamps
@@ -451,5 +451,20 @@ class Statistic(Base):
     join_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="join", null=True)
     
     def get_json(self):
-        stats = get_statistics(self.attribute.id, self.group_by_attribute.id)
-        print(stats)
+        attribute_values = AttributeValue.objects.filter(attribute__in=[self.attribute.id]).order_by("id")
+        group_by_values = AttributeValue.objects.filter(attribute__in=[self.group_by_attribute.id]).order_by("id")
+        
+        delta_index = group_by_values[0].id - attribute_values[0].id
+        
+        start = time.time()
+        
+        for values in attribute_values:
+            values.group_by_value = group_by_values.filter(pk=values.id+delta_index)[0].value
+            
+        counts = attribute_values.values("group_by_value", "value").distinct().count()
+            
+        print(time.time() - start)
+        print(counts)
+        
+        #stats = get_statistics(self.attribute.id, self.group_by_attribute.id)
+        return json.dumps([1])
