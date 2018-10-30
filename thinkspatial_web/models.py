@@ -123,6 +123,10 @@ class Layer(Base):
         for geom_type in Layer.GEOMETRY_TYPE_CHOICES:
             if type.upper() == geom_type[1]:
                 return geom_type[0]
+            
+    @property
+    def has_statistics(self):
+        return len(Statistic.objects.all().filter(selection_attribute__layer_id=self.id)) > 0
 
 
 # represents a single geometry on a map
@@ -458,8 +462,15 @@ class Statistic(Base):
     # group by an attribute
     group_by_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="group_by")
     
+    # attribute of (another) layer to select group_by areas – 
+    # must have the same values as group_by_attribute
+    selection_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="selection")
+    
     def get_json(self):
         attribute_values = AttributeValue.objects.filter(attribute=self.attribute.id).order_by("id").values_list(self.attribute.type_to_column(), flat=True)
         group_by_values = AttributeValue.objects.filter(attribute=self.group_by_attribute.id).order_by("id").values_list(self.group_by_attribute.type_to_column(), flat=True)
         
-        return json.dumps(list(zip(group_by_values, attribute_values)))
+        output = {"options": {"type": self.type, "absolute": self.absolute, "selection": self.selection_attribute.name}}
+        output["values"] = list(zip(group_by_values, attribute_values))
+        
+        return output

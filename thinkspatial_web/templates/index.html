@@ -23,7 +23,7 @@
     var layers = {
     {% for layer in layers %}
         {% if not forloop.first %}, {% endif %}
-        {{ layer.id }}: {name: "{{ layer.name }}", type: "{{ layer.type }}" }
+        {{ layer.id }}: {name: "{{ layer.name }}", type: "{{ layer.type }}", hasStatistics: {{ layer.has_statistics | lower }} }
     {% endfor %}
     };
     
