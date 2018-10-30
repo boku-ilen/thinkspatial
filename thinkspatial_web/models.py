@@ -446,10 +446,8 @@ class Statistic(Base):
 
     # group by an attribute
     group_by_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="group_by")
-    
-    # attribute of another layer to display stats when hovering/clicking
-    join_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="join", null=True)
-    
+
+
     def get_json(self):
         attribute_values = AttributeValue.objects.filter(attribute__in=[self.attribute.id]).order_by("id")
         group_by_values = AttributeValue.objects.filter(attribute__in=[self.group_by_attribute.id]).order_by("id")
