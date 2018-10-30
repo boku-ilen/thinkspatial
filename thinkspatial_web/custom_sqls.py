@@ -2,37 +2,25 @@ from django.db import connection
 
 def get_attributes(layer):
     with connection.cursor() as cursor:
-        cursor.execute("""select a.name, case when a."type"=1 then av.string_value::varchar when a."type"=2 then av.integer_value::varchar when a."type"=3 then av.float_value::varchar when a."type"=4 then av.date_value::varchar end  as value from thinkspatial_web_attribute as a
-join thinkspatial_web_view as v on a.id = v.attribute_id
-join thinkspatial_web_attributevalue as av on a.id = av.attribute_id
-where v.enabled = true and v.layer_id = %s order by av.id""", [layer])
-        rs = cursor.fetchall()
-        
-        cursor.execute("select count(id) from thinkspatial_web_view where layer_id = %s", [layer])
-        count = cursor.fetchone()
-             
-    return [rs, count[0]]
+        cursor.execute("""SELECT DISTINCT a."attribute" FROM
+                            (SELECT v.attribute_id AS "attribute" FROM thinkspatial_web_view v
+                            WHERE v.layer_id = %s
 
-def get_statistics(attribute, group_by):
-    print(attribute, group_by)
-    with connection.cursor() as cursor:
-        query = '''select attr2.value as "key", attr1.value as value from 
-(select a.attribute_id, case when a.string_value is not NULL then a.string_value::varchar when a.integer_value is not NULL then a.integer_value::varchar when a.float_value is not NULL then a.float_value::varchar when a.date_value is not NULL then a.date_value::varchar end as value
-from thinkspatial_web_attributevalue a where a.attribute_id = %s order by a.id) as attr1,
-(select b.attribute_id, case when b.string_value is not NULL then b.string_value::varchar when b.integer_value is not NULL then b.integer_value::varchar when b.float_value is not NULL then b.float_value::varchar when b.date_value is not NULL then b.date_value::varchar end as value
-from thinkspatial_web_attributevalue b where b.attribute_id = %s order by b.id) as attr2'''
-        query = '''select attr2.value as "key", attr1.value as value from 
-(select a.attribute_id, case when a.string_value is not NULL then a.string_value::varchar when a.integer_value is not NULL then a.integer_value::varchar when a.float_value is not NULL then a.float_value::varchar when a.date_value is not NULL then a.date_value::varchar end as value
-from thinkspatial_web_attributevalue a where a.attribute_id = %s order by a.id) as attr1
-join (select b.attribute_id, case when b.string_value is not NULL then b.string_value::varchar when b.integer_value is not NULL then b.integer_value::varchar when b.float_value is not NULL then b.float_value::varchar when b.date_value is not NULL then b.date_value::varchar end as value
-from thinkspatial_web_attributevalue b where b.attribute_id = %s order by b.id) as attr2 on true'''
-        query = '''select attribute_id, string_value, integer_value, float_value, date_value
-from thinkspatial_web_attributevalue where attribute_id in (%s, %s) order by id'''
-        print(19)
-        cursor.execute(query, [attribute, group_by])
-        print(25)
-        rs = cursor.fetchall()
-        print(27)
+                            UNION ALL
+
+                            SELECT a.id AS "attribute" FROM thinkspatial_web_attribute a
+                            JOIN thinkspatial_web_statistic s ON a.id = s.selection_attribute_id
+                            WHERE a.layer_id = %s) a""", [layer, layer])
         
-    print(29)
-    return rs
+        attributes = [t[0] for t in cursor.fetchall()]
+        
+        cursor.execute("""SELECT a.name, CASE WHEN a."type"=1 THEN av.string_value::varchar 
+                            WHEN a."type"=2 then av.integer_value::varchar 
+                            WHEN a."type"=3 THEN av.float_value::varchar 
+                            WHEN a."type"=4 THEN av.date_value::varchar 
+                            END AS value FROM thinkspatial_web_attribute AS a
+                            JOIN thinkspatial_web_attributevalue AS av ON a.id = av.attribute_id
+                            WHERE a.id IN (""" + ",".join(["%s" for x in attributes]) + """) ORDER BY av.id""", attributes)
+        rs = cursor.fetchall()
+             
+    return [rs, len(attributes)]

@@ -124,6 +124,10 @@ class Layer(Base):
             if type.upper() == geom_type[1]:
                 return geom_type[0]
 
+    @property
+    def has_statistics(self):
+        return len(Statistic.objects.all().filter(selection_attribute__layer_id=self.id)) > 0
+
 
 # represents a single geometry on a map
 class Geometry(Base):
@@ -161,6 +165,17 @@ class Attribute(Base):
         for attribute in Attribute.ATTRIBUTE_TYPE:
             if type.upper()[:3] == attribute[1][:3]:
                 return  attribute[0]
+
+    # the used value column in AttributeValue
+    def type_to_column(self):
+        if self.type == 1:
+            return "string_value"
+        elif self.type == 2:
+            return "integer_value"
+        elif self.type == 3:
+            return "float_value"
+        elif self.type == 4:
+            return "date_value"
 
 
 class AttributeValue(Base):
@@ -446,23 +461,16 @@ class Statistic(Base):
 
     # group by an attribute
     group_by_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="group_by")
-
-
+    
+    # attribute of (another) layer to select group_by areas –
+    # must have the same values as group_by_attribute
+    selection_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="selection")
+    
     def get_json(self):
-        attribute_values = AttributeValue.objects.filter(attribute__in=[self.attribute.id]).order_by("id")
-        group_by_values = AttributeValue.objects.filter(attribute__in=[self.group_by_attribute.id]).order_by("id")
+        attribute_values = AttributeValue.objects.filter(attribute=self.attribute.id).order_by("id").values_list(self.attribute.type_to_column(), flat=True)
+        group_by_values = AttributeValue.objects.filter(attribute=self.group_by_attribute.id).order_by("id").values_list(self.group_by_attribute.type_to_column(), flat=True)
         
-        delta_index = group_by_values[0].id - attribute_values[0].id
+        output = {"options": {"type": self.type, "absolute": self.absolute, "selection": self.selection_attribute.name}}
+        output["values"] = list(zip(group_by_values, attribute_values))
         
-        start = time.time()
-        
-        for values in attribute_values:
-            values.group_by_value = group_by_values.filter(pk=values.id+delta_index)[0].value
-            
-        counts = attribute_values.values("group_by_value", "value").distinct().count()
-            
-        print(time.time() - start)
-        print(counts)
-        
-        #stats = get_statistics(self.attribute.id, self.group_by_attribute.id)
-        return json.dumps([1])
+        return output

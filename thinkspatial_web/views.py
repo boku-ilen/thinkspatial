@@ -1,18 +1,23 @@
+from PIL import Image
+import datetime
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
-from django.shortcuts import render
 from django.http import HttpResponse
-from django.conf import settings
+from django.shortcuts import render
 from django.utils.translation import ugettext as _
-
-from thinkspatial_web.models import Project, Geometry, AttributeValue, Layer, Symbol, View, Attribute, Signature, Statistic
-from thinkspatial_web.custom_sqls import get_attributes
-
-from PIL import Image
-import os
-import logging
-import datetime
 import json
+import logging
+import os
+from thinkspatial_web.custom_sqls import get_attributes
+from thinkspatial_web.models import Attribute
+from thinkspatial_web.models import AttributeValue
+from thinkspatial_web.models import Geometry
+from thinkspatial_web.models import Layer
+from thinkspatial_web.models import Project
+from thinkspatial_web.models import Signature
+from thinkspatial_web.models import Statistic
+from thinkspatial_web.models import Symbol
+from thinkspatial_web.models import View
 import time
 
 logger = logging.getLogger(__name__)
@@ -86,11 +91,11 @@ def stylecss(request):
     project = request.session.get("project")
     if project is None:
         # or set default values
-        context = { 'colorLight': '#648127', 'colorDark': '#DBEFB3'}
+        context = {'colorLight': '#648127', 'colorDark': '#DBEFB3'}
         logger.warning("Could not find project in session - rendering style.css with default values")
 
     # TODO: render acutal project related css values
-    context = { 'colorLight': '#648127', 'colorDark': '#DBEFB3'}
+    context = {'colorLight': '#648127', 'colorDark': '#DBEFB3'}
 
     return render(request, "style.css", context, content_type="text/css; charset: UTF-8")
 
@@ -110,13 +115,7 @@ def imgcolor(request):
     img.save(response, "PNG")
     return response
 
-
-# returns a list of POIs as geoJSON
-def poigetgeojson(request, layer):
-
-    # check for a valid session and the current project
-    # project = request.session.get("project")
-
+def generate_layer_json(layer):
     start = time.time()
     lyr = Layer.objects.get(pk=layer)
 
@@ -135,13 +134,26 @@ def poigetgeojson(request, layer):
         # get geometry and properties from all attributes which are referenced in prepared views
         for index, geometry in enumerate(geometries):
             feature = {"geometry": json.loads(geometry.geom.json),
-                       "properties": {attribute[0]: attribute[1] for attribute in
-                                      attributes[index * views:index * views + views]}, "type": "Feature"}
+                "properties": {attribute[0]: attribute[1] for attribute in
+                    attributes[index * views:index * views + views]}, "type": "Feature"}
             response["features"].append(feature)
-
+            
+            logger.debug("complete load time: {}ms".format(time.time() - start))
+            
+        return response
+    
     logger.debug("complete load time: {}ms".format(time.time() - start))
-    return HttpResponse(json.dumps(response).replace('\\"', '\"'), content_type="application/geo+json")
+    
+    return False
 
+# returns a list of POIs as geoJSON
+def poigetgeojson(request, layer):
+
+    # check for a valid session and the current project
+    # project = request.session.get("project")
+
+    response = generate_layer_json(layer)
+    return HttpResponse(json.dumps(response).replace('\\"', '\"'), content_type="application/geo+json")
 
 def symbolsvg(request, id, color, shadow=None):
 
@@ -161,14 +173,14 @@ def symbolsvg(request, id, color, shadow=None):
         shadow_code = None
 
     # render the svg file
-    context = { 'shadow': shadow,
-                'shadow_code': shadow_code,
-                'color': color,
-                'symbol_code': symbol.code,
-                'scale': 0.15,
-                'translate_x': 0,
-                'translate_y': 700,
-                }
+    context = {'shadow': shadow,
+        'shadow_code': shadow_code,
+        'color': color,
+        'symbol_code': symbol.code,
+        'scale': 0.15,
+        'translate_x': 0,
+        'translate_y': 700,
+        }
     return render(request, "symbol.svg", context, content_type="image/svg+xml")
 
 
@@ -191,6 +203,26 @@ def getString(request, key):
     return HttpResponse(json.dumps({key: _(key)}), content_type="application/json")
 
 # returns json for given statistic id
-def get_statistic(request, statistic):
-    stat = Statistic.objects.get(pk=statistic)
-    return HttpResponse(stat.get_json(), content_type="application/json")
+def get_statistics(request, layer):
+    stats = Statistic.objects.all().filter(selection_attribute__layer_id=layer)
+    
+    output = []
+    
+    for stat in stats:
+        output.append(stat.get_json())
+        
+    return HttpResponse(json.dumps(output), content_type="application/json")
+
+def get_layer_data(request, layer):
+    stats = Statistic.objects.all().filter(selection_attribute__layer_id=layer)
+    output = {}
+    
+    for i, stat in enumerate(stats):
+        if i == 0:
+            output["stats"] = []
+            
+        output["stats"].append(stat.get_json())
+        
+    output["geometry"] = generate_layer_json(layer)
+    
+    return HttpResponse(json.dumps(output), content_type="application/json")

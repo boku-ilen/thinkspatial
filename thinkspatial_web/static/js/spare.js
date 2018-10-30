@@ -1,10 +1,29 @@
-var map, layerControl, legend;
+var map, layerControl, legend, rawStatistics, statistics = {};
 
 $(document).ready(function () {
     initLeaflet();
 
     $(document).on("click", "#map .legend-tabs span", updateLegend);
 });
+
+function countUnique(data) {
+    var counts = {};
+
+    $.each(data, function (i, values) {
+        if (counts[values[0]]) {
+            if (counts[values[0]][values[1]]) {
+                counts[values[0]][values[1]]++;
+            } else {
+                counts[values[0]][values[1]] = 1;
+            }
+        } else {
+            counts[values[0]] = {};
+            counts[values[0]][values[1]] = 1;
+        }
+    });
+
+    return counts;
+}
 
 function getLayerbyID(id) {
     var layerName = layers[id].name;
@@ -21,7 +40,7 @@ function getLayerbyID(id) {
 function getLayers() {
     var i = 1;
     $.each(layers, function (id, layer) {
-        $.ajax(root_url + "ajax/" + id + "/layer.geojson", {
+        $.ajax(root_url + "ajax/" + id + "/layer.json", {
             xhr: function () {
                 var xhr = new XMLHttpRequest();
                 var progress = setInterval(function () {
@@ -40,7 +59,15 @@ function getLayers() {
             method: "get",
             dataType: "json",
             success: function (data) {
-                initGeoJSON(layer, data);
+                if (layer.hasStatistics) {
+                    $.each(data.stats, function (i, stat) {
+                        if (i === 0) {
+                            statistics[layer.name] = [];
+                        }
+                        statistics[layer.name].push({"options": stat.options, "values": countUnique(stat.values)});
+                    });
+                }
+                initGeoJSON(layer, data.geometry);
                 if (i === Object.keys(layers).length) {
                     initLegend();
                     $(".disclaimer-modal").hide();
@@ -68,7 +95,7 @@ function getStyle(layer) {
     delete style.onEachFeature;
     delete style.pane;
     delete style.pointToLayer;
-    
+
     return style;
 }
 
@@ -100,9 +127,17 @@ function initGeoJSON(layer, data) {
             return new L.Marker(latlng, {icon: smallIcon, opacity: 0.85});
         },
 
-        onEachFeature: function (feature, layer) {
-            var popupText = "" + feature.properties.crit_oek;
-            layer.bindPopup(popupText);
+        onEachFeature: function (f, l) {
+            //var popupText = "" + f.properties.crit_oek;
+            //l.bindPopup(popupText);
+
+            if (layer.hasStatistics) {
+                var stats = statistics[layer.name];
+                l.on("mouseover", function () {
+                    console.log(stats);
+                    console.log(stats[0].values[f.properties[stats[0].options.selection]]);
+                });
+            }
         }
     }).addTo(map);
 
@@ -243,11 +278,11 @@ function updateStyles(layer, type, attribute, signatures, i) {
                 if (j === 0) {
                     l.setStyle(style);
                 } else if (signature.hover) {
-                    l.on("mouseover", function() {
+                    l.on("mouseover", function () {
                         var originalStyle = getStyle(l);
                         l.setStyle(style);
-                        
-                        l.on("mouseout", function() {
+
+                        l.on("mouseout", function () {
                             l.setStyle(originalStyle);
                         });
                     });
