@@ -1,10 +1,71 @@
-var map, layerControl, legend, rawStatistics, statistics = {};
+var map, layerControl, legend, rawStatistics, statistics = {}, layerClicked = false;
 
 $(document).ready(function () {
     initLeaflet();
 
     $(document).on("click", "#map .legend-tabs span", updateLegend);
 });
+
+var initStackedBarChart = {
+    create: function (statistic, key) {
+        var self = this, data = statistic.values[key], sum = 0,
+                signatures = views[statistic.options.view].signatures;
+        $.each(Object.values(data), function (i, x) {
+            sum += x;
+        });
+
+        var dataArray = $.map(data, function (val, i) {
+            var object = {};
+            object[i] = val;
+            return [[i, val]];
+        });
+
+        var width = $(".legend-container .signature").width();
+        /*var svg = d3.select(".legend-container").append("svg")
+         .attr("width", width).attr("height", rem2px(2)).append("g");*/
+        var xScale = d3.scaleLinear().range([0, width]).domain([0, sum]);
+
+        var div = d3.select(".legend").insert("div", ".legend-container").attr("class", "stackedChart")
+                .style("width", width + "px").style("height", rem2px(1) + "px");
+
+        var xPos = 0;
+        var layer = div.selectAll("div").data(dataArray).enter().append("div")
+                /*.attr("x", function (d) {
+                 var x = xScale(xPos);
+                 xPos += d[1];
+                 return x;
+                 }).attr("y", 0)*/
+                .style("width", function (d) {
+                    return xScale(d[1]) + "px";
+                }).style("height", rem2px(1) + "px")
+                .style("background-color", function (d) {
+                    var signature = self.getSignature(d[0], signatures);
+                    return signature.color;
+                }).text(function (d) {
+            if (statistic.options.absolute) {
+                return d[1];
+            } else {
+                return Math.round(d[1] / sum * 100 * 100) / 100 + "%";
+            }
+        });
+    },
+    getSignature: function (value, signatures) {
+        return signatures.filter(function (sig) {
+            if (typeof sig.values[0] === "string") {
+                return sig.values.indexOf(value) > -1;
+            } else if (typeof sig.values[0] === "number") {
+                if (sig.values.length === 1) {
+                    return sig.values[0] === Number(value);
+                } else {
+                    return sig.values[0] <= Number(value) && Number(value) <= sig.values[1];
+                }
+            }
+        })[0];
+    },
+    removeCharts: function () {
+        $(".legend > div.stackedChart").remove();
+    }
+};
 
 function countUnique(data) {
     var counts = {};
@@ -134,8 +195,14 @@ function initGeoJSON(layer, data) {
             if (layer.hasStatistics) {
                 var stats = statistics[layer.name];
                 l.on("mouseover", function () {
-                    console.log(stats);
-                    console.log(stats[0].values[f.properties[stats[0].options.selection]]);
+                    if (!layerClicked) {
+                        initStackedBarChart.create(stats[0], f.properties[stats[0].options.selection]);
+
+                        l.on("mouseout", function () {
+                            if (!layerClicked)
+                                initStackedBarChart.removeCharts();
+                        });
+                    }
                 });
             }
         }
@@ -278,12 +345,18 @@ function updateStyles(layer, type, attribute, signatures, i) {
                 if (j === 0) {
                     l.setStyle(style);
                 } else if (signature.hover) {
+                    var originalStyle = getStyle(l);
                     l.on("mouseover", function () {
-                        var originalStyle = getStyle(l);
-                        l.setStyle(style);
+                        if (!layerClicked)
+                            l.setStyle(style);
+
+                        l.on("click", function () {
+                            layerClicked = !layerClicked;
+                        });
 
                         l.on("mouseout", function () {
-                            l.setStyle(originalStyle);
+                            if (!layerClicked)
+                                l.setStyle(originalStyle);
                         });
                     });
                 }
