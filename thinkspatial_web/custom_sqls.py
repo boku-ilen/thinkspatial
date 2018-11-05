@@ -3,7 +3,7 @@ from django.db import connection
 def get_attributes(layer):
     with connection.cursor() as cursor:
         cursor.execute("""SELECT DISTINCT a."attribute" FROM
-                            (SELECT v.attribute_id AS "attribute" FROM thinkspatial_web_view v
+                            (SELECT v.attribute_id AS "attribute" FROM thinkspatial_web_view_layer v
                             WHERE v.layer_id = %s
 
                             UNION ALL

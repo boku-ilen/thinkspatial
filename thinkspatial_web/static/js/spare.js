@@ -1,9 +1,11 @@
-var map, layerControl, legend, rawStatistics, statistics = {}, layerClicked = false;
+var map, layerControl, leafletLayers = {}, legend, rawStatistics, statistics = {}, layerClicked = false;
 
 $(document).ready(function () {
     initLeaflet();
 
     $(document).on("click", "#map .legend-tabs span", updateLegend);
+
+    $(document).on("change", "#map .legend input", updateVisibleLayers);
 });
 
 var initStackedBarChart = {
@@ -86,18 +88,6 @@ function countUnique(data) {
     return counts;
 }
 
-function getLayerbyID(id) {
-    var layerName = layers[id].name;
-    try {
-        var layer = layerControl._layers.filter(function (layer) {
-            return layer.name === layerName && layer.overlay;
-        })[0].layer;
-        return layer;
-    } catch (e) {
-        return L.layerGroup();
-    }
-}
-
 function getLayers() {
     var i = 1;
     $.each(layers, function (id, layer) {
@@ -128,7 +118,15 @@ function getLayers() {
                         statistics[layer.name].push({"options": stat.options, "values": countUnique(stat.values)});
                     });
                 }
-                initGeoJSON(layer, data.geometry);
+                leafletLayers[id] = initGeoJSON(layer, data.geometry);
+
+                //temporary
+                
+                if (id <= 17) {
+                    leafletLayers[id].addTo(map);
+                    layerControl.addOverlay(leafletLayers[id], layer.name);
+                }
+
                 if (i === Object.keys(layers).length) {
                     initLegend();
                     $(".disclaimer-modal").hide();
@@ -176,7 +174,7 @@ function initLeaflet() {
 }
 
 function initGeoJSON(layer, data) {
-    var geojson = L.geoJson(data, {
+    return L.geoJson(data, {
         pointToLayer: function (feature, latlng) {
             var iconSize = Math.round(feature.properties.size / 1);
             var smallIcon = L.icon({
@@ -206,9 +204,7 @@ function initGeoJSON(layer, data) {
                 });
             }
         }
-    }).addTo(map);
-
-    layerControl.addOverlay(geojson, layer.name);
+    });
 
     //map.fitBounds(geojson.getBounds());
 }
@@ -234,7 +230,7 @@ function initLegend() {
         var $div = $(this._div);
 
         $.each(views, function (i, view) {
-            if (view.visible)
+            if ([1, 2].indexOf(view.visibility) >= 0)
                 $div.find(".legend-tabs").append($("<span>").text(view.name).attr("data-id", i));
         });
 
@@ -248,10 +244,10 @@ function initLegend() {
 
 function initDefaultViews() {
     $.each(views, function (i, view) {
-        if (view.defaultView && view.visible) {
+        if (view.defaultView && [1, 2].indexOf(view.visibility) >= 0) {
             $(".legend-tabs span[data-id=" + i + "]").click();
-        } else if (view.defaultView && !view.visible) {
-            updateStyles(getLayerbyID(view.layer), view.type, view.attribute, view.signatures, 0);
+        } else if (view.defaultView && [0, 3].indexOf(view.visibility) >= 0) {
+            updateStyles(i, view.type, view.signatures, 0);
         }
     });
 }
@@ -273,96 +269,135 @@ function updateLegend() {
         _views.push(views[id]);
     });
 
+    $.each(views, function (i, view) {
+        if (view.visibility === 3)
+            _views.push(view);
+    });
+
     $("div.legend-tabs .active").removeClass("active");
     $(this).addClass("active");
+
+    var $inputs = $("div.legend-container input").clone();
 
     $("div.legend-tabs").nextAll().remove();
 
     $.each(_views, function (i, view) {
-
         $legendContainer = $("<div>").addClass("legend-container");
         if (i > 0) {
             $legendContainer.append($("<span>").text(view.name));
         }
 
-        $.each(view.signatures, function (i, signature) {
-            $key = $("<div>").addClass("signature").append($("<span>").html(signature.label));
-            $legendContainer.append($key);
-            $(".legend").append($legendContainer);
-            var svg = d3.select(".legend-container:last-child div.signature:last-child").insert("svg", ":first-child").attr("width", rem2px(4)).attr("height", rem2px(2)).attr("viewBox", "0 0 32 16");
-            svg.append("line").attr("x1", 0).attr("x2", 32).attr("y1", 8).attr("y2", 8).attr("stroke-width", signature.weight).attr("stroke", signature.color);
-        });
+        if (view.visibility !== 3) {
+            $.each(view.signatures, function (i, signature) {
+                $key = $("<div>").addClass("signature").append($("<span>").html(signature.label));
+                $legendContainer.append($key);
+                $(".legend").append($legendContainer);
+                var svg = d3.select(".legend-container:last-child div.signature:last-child").insert("svg", ":first-child").attr("width", rem2px(4)).attr("height", rem2px(2)).attr("viewBox", "0 0 32 16");
+                svg.append("line").attr("x1", 0).attr("x2", 32).attr("y1", 8).attr("y2", 8).attr("stroke-width", signature.weight).attr("stroke", signature.color);
+            });
 
-        updateStyles(getLayerbyID(view.layer), view.type, view.attribute, view.signatures, i);
+            updateStyles(view.id, view.type, view.signatures, i);
+        } else {
+            $.each(layer_views, function (i, layer_view) {
+                if (Object.keys(layer_view).indexOf(view.id.toString()) >= 0) {
+                    $div = $("<div>");
+                    $div.append($("<input>").attr("type", "radio").attr("name", view.id).val(i));
+                    $div.append($("<span>").text(layers[i].name));
+                    $div.appendTo($legendContainer);
+                }
+            });
+
+            $selected = $inputs.find("[name=" + view.id + "]:selected");
+            if ($selected.length === 1) {
+                $legendContainer.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("selected", true);
+            } else {
+                $legendContainer.find("[name=" + view.id + "]").first().prop("selcted", true);
+            }
+
+            $(".legend").append($legendContainer);
+        }
     });
 }
 
-function updateStyles(layer, type, attribute, signatures, i) {
-    layer.eachLayer(function (l) {
-        var props = l.feature.properties, style = {};
-        var layerSignatures = signatures.filter(function (sig) {
-            if (typeof sig.values[0] === "string") {
-                return sig.values.indexOf(props[attribute]) > -1;
-            } else if (typeof sig.values[0] === "number") {
-                if (sig.values.length === 1) {
-                    return sig.values[0] === Number(props[attribute]);
-                } else {
-                    return sig.values[0] <= Number(props[attribute]) && Number(props[attribute]) <= sig.values[1];
-                }
-            }
-        });
+function updateStyles(view, type, signatures, i) {
+    $.each(layer_views, function (layerId, layer_view) {
+        if (typeof layer_view[view] !== "undefined") {
+            var layer = leafletLayers[layerId];
+            var attribute = layer_view[view].attribute;
 
-        if (layerSignatures.length > 0) {
-            $.each(layerSignatures, function (j, signature) {
-                if ([1, 4, 5, 7, 9, 12, 13, 15].indexOf(type) >= 0) {
-                    style.color = signature.color;
-                    if (typeof signature.opacity !== "undefined") {
-                        style.opacity = signature.opacity;
+            layer.eachLayer(function (l) {
+                var props = l.feature.properties, style = {};
+                var layerSignatures = signatures.filter(function (sig) {
+                    if (sig.values[0] === "*")
+                        return true;
+                    if (typeof sig.values[0] === "string") {
+                        return sig.values.indexOf(props[attribute]) > -1;
+                    } else if (typeof sig.values[0] === "number") {
+                        if (sig.values.length === 1) {
+                            return sig.values[0] === Number(props[attribute]);
+                        } else {
+                            return sig.values[0] <= Number(props[attribute]) && Number(props[attribute]) <= sig.values[1];
+                        }
                     }
-                }
+                });
 
-                if ([2, 4, 6, 7, 10, 12, 14, 15].indexOf(type) >= 0) {
-                    style.weight = signature.weight;
-                }
+                if (layerSignatures.length > 0) {
+                    $.each(layerSignatures, function (j, signature) {
+                        if ([1, 4, 5, 7, 9, 12, 13, 15].indexOf(type) >= 0) {
+                            style.color = signature.color;
+                            if (typeof signature.opacity !== "undefined") {
+                                style.opacity = signature.opacity;
+                            }
+                        }
 
-                if ([3, 5, 6, 7, 11, 13, 14, 15].indexOf(type) >= 0) {
-                    style["dash-array"] = signature.dashArray;
-                }
+                        if ([2, 4, 6, 7, 10, 12, 14, 15].indexOf(type) >= 0) {
+                            style.weight = signature.weight;
+                        }
 
-                if ([8, 9, 10, 11, 12, 13, 14, 15].indexOf(type) >= 0) {
-                    style.fillColor = signature.fillColor;
-                    if (typeof signature.fillOpacity !== "undefined") {
-                        style.fillOpacity = signature.fillOpacity;
-                    }
-                }
+                        if ([3, 5, 6, 7, 11, 13, 14, 15].indexOf(type) >= 0) {
+                            style["dash-array"] = signature.dashArray;
+                        }
 
-                if (i === 0) {
-                    style.stroke = true;
-                } else {
-                    style.stroke = l.options.stroke && true;
-                }
+                        if ([8, 9, 10, 11, 12, 13, 14, 15].indexOf(type) >= 0) {
+                            style.fillColor = signature.fillColor;
+                            if (typeof signature.fillOpacity !== "undefined") {
+                                style.fillOpacity = signature.fillOpacity;
+                            }
+                        }
 
-                if (j === 0) {
-                    l.setStyle(style);
-                } else if (signature.hover) {
-                    var originalStyle = getStyle(l);
-                    l.on("mouseover", function () {
-                        if (!layerClicked)
+                        if (i === 0) {
+                            style.stroke = true;
+                        } else {
+                            style.stroke = l.options.stroke && true;
+                        }
+
+                        if (j === 0) {
                             l.setStyle(style);
+                        } else if (signature.hover) {
+                            var originalStyle = getStyle(l);
+                            l.on("mouseover", function () {
+                                if (!layerClicked)
+                                    l.setStyle(style);
 
-                        l.on("click", function () {
-                            layerClicked = !layerClicked;
-                        });
+                                l.on("click", function () {
+                                    layerClicked = !layerClicked;
+                                });
 
-                        l.on("mouseout", function () {
-                            if (!layerClicked)
-                                l.setStyle(originalStyle);
-                        });
+                                l.on("mouseout", function () {
+                                    if (!layerClicked)
+                                        l.setStyle(originalStyle);
+                                });
+                            });
+                        }
                     });
+                } else {
+                    l.setStyle({stroke: false});
                 }
             });
-        } else {
-            l.setStyle({stroke: false});
         }
     });
+}
+
+function updateVisibleLayers() {
+
 }

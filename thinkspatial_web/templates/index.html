@@ -28,14 +28,12 @@
     };
     
     var views = {
-    {% for layer, views1 in views.items %}
+    {% for id, view1 in views.items %}
     {% if not forloop.first %}, {% endif %}
-    {% for view in views1 %}
-    {% if not forloop.first %}, {% endif %}
-    {{ view.id }}: {name: "{{ view.name }}", attribute: "{{ view.attribute.name }}", concurrents: {{ view.concurrents_as_json }}, layer: {{ layer.id }}, type: {{ view.signature_type }}, visible: {{ view.visible|lower }},
+    {{ id }}: {id: {{ id }}, name: "{{ view1.name }}", concurrents: {{ view1.concurrents_as_json }} , type: {{ view1.signature_type }}, visibility: {{ view1.visibility }},
         signatures: [
             {% for view2, signature1 in signatures.items %}
-            {% if view2 == view %}
+            {% if view2 == id %}
                 {% for signature in signature1  %}
                 {% if not forloop.first %}, {% endif %}
                 { {% if signature.label is not None %} label: "{{ signature.label }}",{% endif %}
@@ -51,10 +49,11 @@
                 {% endfor %}
             {% endif %}
             {% endfor %}
-        ], defaultView: {{ view.default | lower }}}
+        ], defaultView: {{ view1.default | lower }}}
     {% endfor %}
-    {% endfor %}
-    }
+    };
+    
+    var layer_views = {{layer_views | safe}};
 
     // base settings
     project_id = {{ project_id }};

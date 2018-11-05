@@ -103,6 +103,7 @@ class Layer(Base):
         (4, 'POINT3D'),
         (5, 'LINESTRING3D'),
         (6, 'POLYGON3D'),
+        (7, 'MULTIPOLYGON')
     )
 
     # a project can have multiple layers
@@ -238,15 +239,19 @@ class View(Base):
         (14, "FILL_WEIGHT_DASH"),
         (15, "ALL")
     )
+    
+    VISIBILITY_CHOICES = (
+        (0, "INVISIBLE"),
+        (1, "TAB"), # selectable in view tabs
+        (2, "TAB NO DESELECT"),
+        (3, "RADIO") # (layers) selectable only in radio button group
+    )
 
     # the name of the predefined view
     name = models.TextField()
-
-    # the layer associated with this view
-    layer = models.ForeignKey(Layer, on_delete=models.PROTECT)
-
-    # the associated attribute
-    attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT)
+    
+    # the layers associated with this view    
+    layers = models.ManyToManyField(Layer, through="View_Layer")
 
     enabled = models.BooleanField(default=True)
     
@@ -258,7 +263,7 @@ class View(Base):
     
     concurrent_views = models.ManyToManyField("self", blank=True)
     
-    visible = models.BooleanField(default=True)
+    visibility = models.PositiveIntegerField(choices=VISIBILITY_CHOICES, default=1)
     
     def concurrents_as_json(self):
         js = json.dumps(list(self.concurrent_views.all().values_list("id")))
@@ -267,6 +272,11 @@ class View(Base):
         else:
             return js
 
+class View_Layer(Base):
+    view = models.ForeignKey(View, on_delete=models.PROTECT)
+    layer = models.ForeignKey(Layer, on_delete=models.PROTECT)
+    attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT)
+    order = models.PositiveIntegerField(default=0)
 
 # represents an optional group of categories
 class Category_group(Base):
