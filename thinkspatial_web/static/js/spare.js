@@ -120,11 +120,14 @@ function getLayers() {
                 }
                 leafletLayers[id] = initGeoJSON(layer, data.geometry);
 
-                //temporary
-                
-                if (id <= 17) {
-                    leafletLayers[id].addTo(map);
-                    layerControl.addOverlay(leafletLayers[id], layer.name);
+                var _views = getViewsByLayerId(id), len = _views.length, j = 0;
+
+                for (j; j < len; j++) {
+                    if (_views[j].visibility !== 3) {
+                        leafletLayers[id].addTo(map);
+                        //layerControl.addOverlay(leafletLayers[id], layer.name);
+                        break;
+                    }
                 }
 
                 if (i === Object.keys(layers).length) {
@@ -158,6 +161,16 @@ function getStyle(layer) {
     return style;
 }
 
+function getViewsByLayerId(layer) {
+    var layerViews = [];
+
+    $.each(Object.keys(layer_views[layer]), function (i, viewId) {
+        layerViews.push(views[viewId]);
+    });
+
+    return layerViews;
+}
+
 function initLeaflet() {
     map = L.map('map', {
         center: map_center,
@@ -187,13 +200,10 @@ function initGeoJSON(layer, data) {
         },
 
         onEachFeature: function (f, l) {
-            //var popupText = "" + f.properties.crit_oek;
-            //l.bindPopup(popupText);
-
             if (layer.hasStatistics) {
                 var stats = statistics[layer.name];
                 l.on("mouseover", function () {
-                    if (!layerClicked) {
+                    if (!layerClicked && $("div.legend-tabs [data-id=" + stats[0].options.view + "]").hasClass("active")) {
                         initStackedBarChart.create(stats[0], f.properties[stats[0].options.selection]);
 
                         l.on("mouseout", function () {
@@ -306,15 +316,15 @@ function updateLegend() {
                     $div.appendTo($legendContainer);
                 }
             });
-
-            $selected = $inputs.find("[name=" + view.id + "]:selected");
-            if ($selected.length === 1) {
-                $legendContainer.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("selected", true);
-            } else {
-                $legendContainer.find("[name=" + view.id + "]").first().prop("selcted", true);
-            }
-
+            
             $(".legend").append($legendContainer);
+            
+            $selected = $inputs.find("[name=" + view.id + "]:checked");
+            if ($selected.length === 1) {
+                $legendContainer.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("checked", true);
+            } else {
+                $legendContainer.find("[name=" + view.id + "]").first().prop("checked", true).change();//
+            }
         }
     });
 }
@@ -399,5 +409,13 @@ function updateStyles(view, type, signatures, i) {
 }
 
 function updateVisibleLayers() {
+    var $this = $(this), viewId = parseInt($this.attr("name")), layerId = parseInt($this.val());
 
+    $.each(leafletLayers, function (i, layer) {
+        if (map.hasLayer(layer) && Object.keys(layer_views[i]).indexOf(viewId.toString()) >= 0) {
+            layer.removeFrom(map);
+        }
+    });
+
+    leafletLayers[layerId].addTo(map);
 }
