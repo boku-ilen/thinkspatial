@@ -115,6 +115,8 @@ def imgcolor(request):
     img.save(response, "PNG")
     return response
 
+
+# returns the geojson data including used attribue values for a given layer
 def generate_layer_json(layer):
     start = time.time()
     lyr = Layer.objects.get(pk=layer)
@@ -127,7 +129,7 @@ def generate_layer_json(layer):
         logger.debug("startup time: {}ms".format(time.time() - start))
         geometries = Geometry.objects.filter(layer=lyr).order_by("id") # , geom__within=boundingbox
         logger.debug("geometries load time: {}ms (suspected to be lazy loaded)".format(time.time() - start))
-        attributes = get_attributes(lyr.id)[0:500]
+        attributes = get_attributes(lyr.id)  # [0:500]
         views = attributes[1]
         attributes = attributes[0]
 
@@ -141,9 +143,9 @@ def generate_layer_json(layer):
             logger.debug("complete load time: {}ms".format(time.time() - start))
             
         return response
-    
-    logger.debug("complete load time: {}ms".format(time.time() - start))
-    
+
+    # no layer data could be found so return an empty answer
+    logger.info("could not find a layer: {} - complete load time: {}ms".format(layer, time.time() - start))
     return False
 
 # returns a list of POIs as geoJSON

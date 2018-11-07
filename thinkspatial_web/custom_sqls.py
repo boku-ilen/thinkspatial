@@ -1,5 +1,6 @@
 from django.db import connection
 
+
 def get_attributes(layer):
     with connection.cursor() as cursor:
         cursor.execute("""SELECT DISTINCT a."attribute" FROM
