@@ -9,15 +9,7 @@ import json
 import logging
 import os
 from thinkspatial_web.custom_sqls import get_attributes
-from thinkspatial_web.models import Attribute
-from thinkspatial_web.models import AttributeValue
-from thinkspatial_web.models import Geometry
-from thinkspatial_web.models import Layer
-from thinkspatial_web.models import Project
-from thinkspatial_web.models import Signature
-from thinkspatial_web.models import Statistic
-from thinkspatial_web.models import Symbol
-from thinkspatial_web.models import View
+from thinkspatial_web.models import *
 import time
 
 logger = logging.getLogger(__name__)
@@ -41,13 +33,23 @@ def index(request, template=None):
     # get the associated layers & predefined views
     layers = Layer.objects.filter(project=project, enabled=True)
     views = {}
+    for view in View_Layer.objects.filter(layer__in=layers, layer__project=project).order_by("order").values_list("view", flat=True):
+        view = View.objects.get(pk=view)
+        views[view.id] = view
+    
+    layer_views = {}
+    
     for layer in layers:
-        views[layer] = View.objects.filter(layer=layer, enabled=True)
+        _views = View_Layer.objects.filter(layer=layer).values("view", "attribute__name", "order")
+        layer_views[layer.id] = {}
+        for view in _views:
+            layer_views[layer.id][view["view"]] = {}
+            layer_views[layer.id][view["view"]]["attribute"] = view["attribute__name"]
+            layer_views[layer.id][view["view"]]["order"] = view["order"]
         
     signatures = {}
-    for layer, views1 in views.items():
-        for view in views1:
-            signatures[view] = Signature.objects.filter(view=view).order_by("order")
+    for id, view in views.items():
+        signatures[id] = Signature.objects.filter(view=view).order_by("order")
 
     # read center of the current project
     center = GEOSGeometry(project.center_wkt)
@@ -65,6 +67,7 @@ def index(request, template=None):
         'project_id': project.id,
         'layers': layers,
         'views': views,
+        'layer_views': layer_views,
         'signatures': signatures,
         'basemaps': basemaps,
         'zoom_min': project.zoom_min,
@@ -127,7 +130,7 @@ def generate_layer_json(layer):
         # TODO: add crs?
 
         logger.debug("startup time: {}ms".format(time.time() - start))
-        geometries = Geometry.objects.filter(layer=lyr).order_by("id") # , geom__within=boundingbox
+        geometries = Geometry.objects.filter(layer=lyr).order_by("id")[0:500] # , geom__within=boundingbox
         logger.debug("geometries load time: {}ms (suspected to be lazy loaded)".format(time.time() - start))
         attributes = get_attributes(lyr.id)  # [0:500]
         views = attributes[1]

@@ -1,9 +1,7 @@
-var map, layerControl, legend, rawStatistics, statistics = {}, layerClicked = false;
+var map, layerControl, leafletLayers = {}, legend, rawStatistics, statistics = {}, layerClicked = false;
 
 $(document).ready(function () {
     initLeaflet();
-
-    $(document).on("click", "#map .legend-tabs span", updateLegend);
 });
 
 var initStackedBarChart = {
@@ -20,21 +18,14 @@ var initStackedBarChart = {
             return [[i, val]];
         });
 
-        var width = $(".legend-container .signature").width();
-        /*var svg = d3.select(".legend-container").append("svg")
-         .attr("width", width).attr("height", rem2px(2)).append("g");*/
+        var width = $(".legend-container").innerWidth();
         var xScale = d3.scaleLinear().range([0, width]).domain([0, sum]);
 
-        var div = d3.select(".legend").insert("div", ".legend-container").attr("class", "stackedChart")
+        var div = d3.select("div.legend div.legend-container[data-view='" + statistic.options.view + "']").insert("div", "div.signatures").attr("class", "stackedChart")
                 .style("width", width + "px").style("height", rem2px(1) + "px");
 
         var xPos = 0;
         var layer = div.selectAll("div").data(dataArray).enter().append("div")
-                /*.attr("x", function (d) {
-                 var x = xScale(xPos);
-                 xPos += d[1];
-                 return x;
-                 }).attr("y", 0)*/
                 .style("width", function (d) {
                     return xScale(d[1]) + "px";
                 }).style("height", rem2px(1) + "px")
@@ -63,7 +54,7 @@ var initStackedBarChart = {
         })[0];
     },
     removeCharts: function () {
-        $(".legend > div.stackedChart").remove();
+        $("div.legend div.stackedChart").remove();
     }
 };
 
@@ -84,18 +75,6 @@ function countUnique(data) {
     });
 
     return counts;
-}
-
-function getLayerbyID(id) {
-    var layerName = layers[id].name;
-    try {
-        var layer = layerControl._layers.filter(function (layer) {
-            return layer.name === layerName && layer.overlay;
-        })[0].layer;
-        return layer;
-    } catch (e) {
-        return L.layerGroup();
-    }
 }
 
 function getLayers() {
@@ -128,9 +107,20 @@ function getLayers() {
                         statistics[layer.name].push({"options": stat.options, "values": countUnique(stat.values)});
                     });
                 }
-                initGeoJSON(layer, data.geometry);
+                leafletLayers[id] = initGeoJSON(layer, data.geometry);
+
+                var _views = getViewsByLayerId(id), len = _views.length, j = 0;
+
+                for (j; j < len; j++) {
+                    if (_views[j].visibility !== 3) {
+                        leafletLayers[id].addTo(map);
+                        //layerControl.addOverlay(leafletLayers[id], layer.name);
+                        break;
+                    }
+                }
+
                 if (i === Object.keys(layers).length) {
-                    initLegend();
+                    legend = new Legend();
                     $(".disclaimer-modal").hide();
                 } else {
                     i++;
@@ -138,7 +128,7 @@ function getLayers() {
             },
             error: function (jqXHR, textStatus, errorThrown) {
                 if (i === Object.keys(layers).length) {
-                    initLegend();
+                    legend = new Legend();
                     $(".disclaimer-modal").hide();
                 } else {
                     i++;
@@ -160,6 +150,16 @@ function getStyle(layer) {
     return style;
 }
 
+function getViewsByLayerId(layer) {
+    var layerViews = [];
+
+    $.each(Object.keys(layer_views[layer]), function (i, viewId) {
+        layerViews.push(views[viewId]);
+    });
+
+    return layerViews;
+}
+
 function initLeaflet() {
     map = L.map('map', {
         center: map_center,
@@ -176,7 +176,7 @@ function initLeaflet() {
 }
 
 function initGeoJSON(layer, data) {
-    var geojson = L.geoJson(data, {
+    return L.geoJson(data, {
         pointToLayer: function (feature, latlng) {
             var iconSize = Math.round(feature.properties.size / 1);
             var smallIcon = L.icon({
@@ -189,26 +189,25 @@ function initGeoJSON(layer, data) {
         },
 
         onEachFeature: function (f, l) {
-            //var popupText = "" + f.properties.crit_oek;
-            //l.bindPopup(popupText);
-
             if (layer.hasStatistics) {
                 var stats = statistics[layer.name];
                 l.on("mouseover", function () {
                     if (!layerClicked) {
-                        initStackedBarChart.create(stats[0], f.properties[stats[0].options.selection]);
+                        $.each(stats, function (i, statistic) {
+                            if (statistic.options.view === legend.selectedView) {
+                                initStackedBarChart.create(statistic, f.properties[statistic.options.selection]);
 
-                        l.on("mouseout", function () {
-                            if (!layerClicked)
-                                initStackedBarChart.removeCharts();
+                                l.on("mouseout", function () {
+                                    if (!layerClicked)
+                                        initStackedBarChart.removeCharts();
+                                });
+                            }
                         });
                     }
                 });
             }
         }
-    }).addTo(map);
-
-    layerControl.addOverlay(geojson, layer.name);
+    });
 
     //map.fitBounds(geojson.getBounds());
 }
@@ -225,37 +224,6 @@ function initLayerControl() {
     }
 }
 
-function initLegend() {
-    legend = L.control({position: "bottomright"});
-
-    legend.onAdd = function (map) {
-        this._div = L.DomUtil.create("div", "legend");
-        this._div.innerHTML = "<div class='legend-tabs'></div><div class='legend-container'></div>";
-        var $div = $(this._div);
-
-        $.each(views, function (i, view) {
-            if (view.visible)
-                $div.find(".legend-tabs").append($("<span>").text(view.name).attr("data-id", i));
-        });
-
-        return this._div;
-    };
-
-    legend.addTo(map);
-
-    initDefaultViews();
-}
-
-function initDefaultViews() {
-    $.each(views, function (i, view) {
-        if (view.defaultView && view.visible) {
-            $(".legend-tabs span[data-id=" + i + "]").click();
-        } else if (view.defaultView && !view.visible) {
-            updateStyles(getLayerbyID(view.layer), view.type, view.attribute, view.signatures, 0);
-        }
-    });
-}
-
 function rem2px(rem) {
     return parseInt(window.getComputedStyle(document.documentElement)["font-size"]) * rem;
 }
@@ -266,103 +234,237 @@ function resetStroke() {
     });
 }
 
-function updateLegend() {
-    var _views = [views[$(this).data("id")]];
+function updateStyles(view, type, signatures, i) {
+    $.each(layer_views, function (layerId, layer_view) {
+        if (typeof layer_view[view] !== "undefined") {
+            var layer = leafletLayers[layerId];
+            var attribute = layer_view[view].attribute;
 
-    $.each(_views[0].concurrents, function (i, id) {
-        _views.push(views[id]);
-    });
-
-    $("div.legend-tabs .active").removeClass("active");
-    $(this).addClass("active");
-
-    $("div.legend-tabs").nextAll().remove();
-
-    $.each(_views, function (i, view) {
-
-        $legendContainer = $("<div>").addClass("legend-container");
-        if (i > 0) {
-            $legendContainer.append($("<span>").text(view.name));
-        }
-
-        $.each(view.signatures, function (i, signature) {
-            $key = $("<div>").addClass("signature").append($("<span>").html(signature.label));
-            $legendContainer.append($key);
-            $(".legend").append($legendContainer);
-            var svg = d3.select(".legend-container:last-child div.signature:last-child").insert("svg", ":first-child").attr("width", rem2px(4)).attr("height", rem2px(2)).attr("viewBox", "0 0 32 16");
-            svg.append("line").attr("x1", 0).attr("x2", 32).attr("y1", 8).attr("y2", 8).attr("stroke-width", signature.weight).attr("stroke", signature.color);
-        });
-
-        updateStyles(getLayerbyID(view.layer), view.type, view.attribute, view.signatures, i);
-    });
-}
-
-function updateStyles(layer, type, attribute, signatures, i) {
-    layer.eachLayer(function (l) {
-        var props = l.feature.properties, style = {};
-        var layerSignatures = signatures.filter(function (sig) {
-            if (typeof sig.values[0] === "string") {
-                return sig.values.indexOf(props[attribute]) > -1;
-            } else if (typeof sig.values[0] === "number") {
-                if (sig.values.length === 1) {
-                    return sig.values[0] === Number(props[attribute]);
-                } else {
-                    return sig.values[0] <= Number(props[attribute]) && Number(props[attribute]) <= sig.values[1];
-                }
-            }
-        });
-
-        if (layerSignatures.length > 0) {
-            $.each(layerSignatures, function (j, signature) {
-                if ([1, 4, 5, 7, 9, 12, 13, 15].indexOf(type) >= 0) {
-                    style.color = signature.color;
-                    if (typeof signature.opacity !== "undefined") {
-                        style.opacity = signature.opacity;
+            layer.eachLayer(function (l) {
+                var props = l.feature.properties, style = {};
+                var layerSignatures = signatures.filter(function (sig) {
+                    if (sig.values[0] === "*")
+                        return true;
+                    if (typeof sig.values[0] === "string") {
+                        return sig.values.indexOf(props[attribute]) > -1;
+                    } else if (typeof sig.values[0] === "number") {
+                        if (sig.values.length === 1) {
+                            return sig.values[0] === Number(props[attribute]);
+                        } else {
+                            return sig.values[0] <= Number(props[attribute]) && Number(props[attribute]) <= sig.values[1];
+                        }
                     }
-                }
+                });
 
-                if ([2, 4, 6, 7, 10, 12, 14, 15].indexOf(type) >= 0) {
-                    style.weight = signature.weight;
-                }
+                if (layerSignatures.length > 0) {
+                    $.each(layerSignatures, function (j, signature) {
+                        if ([1, 4, 5, 7, 9, 12, 13, 15].indexOf(type) >= 0) {
+                            style.color = signature.color;
+                            if (typeof signature.opacity !== "undefined") {
+                                style.opacity = signature.opacity;
+                            }
+                        }
 
-                if ([3, 5, 6, 7, 11, 13, 14, 15].indexOf(type) >= 0) {
-                    style["dash-array"] = signature.dashArray;
-                }
+                        if ([2, 4, 6, 7, 10, 12, 14, 15].indexOf(type) >= 0) {
+                            style.weight = signature.weight;
+                        }
 
-                if ([8, 9, 10, 11, 12, 13, 14, 15].indexOf(type) >= 0) {
-                    style.fillColor = signature.fillColor;
-                    if (typeof signature.fillOpacity !== "undefined") {
-                        style.fillOpacity = signature.fillOpacity;
-                    }
-                }
+                        if ([3, 5, 6, 7, 11, 13, 14, 15].indexOf(type) >= 0) {
+                            style["dash-array"] = signature.dashArray;
+                        }
 
-                if (i === 0) {
-                    style.stroke = true;
-                } else {
-                    style.stroke = l.options.stroke && true;
-                }
+                        if ([8, 9, 10, 11, 12, 13, 14, 15].indexOf(type) >= 0) {
+                            style.fillColor = signature.fillColor;
+                            if (typeof signature.fillOpacity !== "undefined") {
+                                style.fillOpacity = signature.fillOpacity;
+                            }
+                        }
 
-                if (j === 0) {
-                    l.setStyle(style);
-                } else if (signature.hover) {
-                    var originalStyle = getStyle(l);
-                    l.on("mouseover", function () {
-                        if (!layerClicked)
+                        if (i === 0) {
+                            style.stroke = true;
+                        } else {
+                            style.stroke = l.options.stroke && true;
+                        }
+
+                        if (j === 0) {
                             l.setStyle(style);
+                        } else if (signature.hover) {
+                            var originalStyle = getStyle(l);
+                            l.on("mouseover", function () {
+                                if (!layerClicked)
+                                    l.setStyle(style);
 
-                        l.on("click", function () {
-                            layerClicked = !layerClicked;
-                        });
+                                l.on("click", function () {
+                                    layerClicked = !layerClicked;
+                                });
 
-                        l.on("mouseout", function () {
-                            if (!layerClicked)
-                                l.setStyle(originalStyle);
-                        });
+                                l.on("mouseout", function () {
+                                    if (!layerClicked)
+                                        l.setStyle(originalStyle);
+                                });
+                            });
+                        }
                     });
+                } else {
+                    l.setStyle({stroke: false});
                 }
             });
-        } else {
-            l.setStyle({stroke: false});
         }
     });
 }
+
+function updateVisibleLayers() {
+    var $this = $(this), viewId = parseInt($this.attr("name")), layerId = parseInt($this.val());
+
+    $.each(leafletLayers, function (i, layer) {
+        if (map.hasLayer(layer) && Object.keys(layer_views[i]).indexOf(viewId.toString()) >= 0) {
+            layer.removeFrom(map);
+        }
+    });
+
+    leafletLayers[layerId].addTo(map);
+}
+
+/*
+ * Legend-Class (ES5)
+ */
+
+function Legend() {
+    //add overlay to map
+
+    var control = L.control({position: "bottomright"});
+    control.onAdd = function () {
+        return L.DomUtil.create("div", "legend");
+    };
+    control.addTo(map);
+
+    this.$legend = $("div.legend");
+    this.$inputs;
+    this.selectedView;
+    this.views;
+
+    this.init();
+}
+;
+
+Legend.prototype.constructor = Legend;
+
+Legend.prototype.init = function () {
+    //add tab for every view of type 1
+
+    this.$legend.append($("<div>").addClass("legend-tabs"));
+    var _self = this;
+
+    $.each(views, function (i, view) {
+        if ([1, 2].indexOf(view.visibility) >= 0) {
+            _self.$legend.children("div.legend-tabs").append($("<span>").text(view.name).attr("data-view", i));
+        }
+    });
+
+    this.$legend.on("click", "div.legend-tabs span", function () {
+        _self.$legend.find("span.active").removeClass("active");
+        $(this).addClass("active");
+
+        _self.selectedView = $(this).data("view");
+        _self.update();
+    });
+
+    this.$legend.find("div.legend-tabs span").first().click();
+};
+
+Legend.prototype.addViewSignatures = function (view) {
+    var $container = $("<div>").addClass("legend-container").attr("data-view", view.id);
+    $container.append($("<span>").text(view.name));
+    $container.append($("<div>").addClass("signatures"));
+
+    $.each(view.signatures, function (i, signature) {
+        var $signature = $("<div>").addClass("signature");
+        $signature.append(signature.svg, $("<span>").text(signature.label));
+        $signature.appendTo($container.find(".signatures"));
+    });
+
+    this.$legend.append($container);
+};
+
+Legend.prototype.addViewRadioButtons = function (view) {
+    var $container = $("<div>").addClass("legend-container");
+    $container.append($("<span>").text(view.name));
+
+    $.each(layer_views, function (i, layer_view) {
+        if (Object.keys(layer_view).indexOf(view.id.toString()) >= 0) {
+            $div = $("<div>");
+            $div.append($("<input>").attr("type", "radio").attr("name", view.id).val(i));
+            $div.append($("<span>").text(layers[i].name));
+            $div.appendTo($container);
+        }
+    });
+
+    $(".legend").append($container);
+    $container.on("change", "input", updateVisibleLayers);
+
+    var $selected = this.$inputs.find("[name=" + view.id + "]:checked");
+    if ($selected.length === 1) {
+        $container.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("checked", true);
+    } else {
+        $container.find("[name=" + view.id + "]").first().prop("checked", true).change();//
+    }
+
+    this.$legend.append($container);
+};
+
+Legend.prototype.clear = function () {
+    this.$legend.children("div.legend-tabs").nextAll().remove();
+};
+
+Legend.prototype.update = function () {
+    this.updateViews();
+    var _self = this;
+
+    this.$inputs = this.$legend.find("input").clone();
+    this.clear();
+
+    $.each(this.views, function (i, view) {
+        switch (view.visibility) {
+            case 0:
+            case 1:
+            case 2:
+                _self.addViewSignatures(view);
+                break;
+            case 3:
+                _self.addViewRadioButtons(view);
+                break;
+        }
+    });
+};
+
+Legend.prototype.updateViews = function () {
+    this.views = [];
+    var viewId = this.selectedView;
+    var _self = this, j = 0;
+
+    $.each(views, function (i, view) {
+        if (view.id === viewId ||
+                (_self.views[0] && _self.views[0].concurrents.indexOf(view.id) >= 0) ||
+                [3, 4].indexOf(view.visibility) >= 0) {
+            updateStyles(view.id, view.type, view.signatures, j);
+            _self.views.push(view);
+            j++;
+        }
+    });
+};
+
+/*
+ * Statistic-Class (ES5)
+ */
+
+var Statistic = function () {
+
+};
+
+Statistic.prototype.init = function () {
+
+};
+
+Statistic.prototype.filter = function () {
+
+};
