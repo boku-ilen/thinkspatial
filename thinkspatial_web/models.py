@@ -1,7 +1,6 @@
 from django.contrib.auth.models import User
 from django.contrib.gis.db import models
 import json
-import time
 
 
 # common base class to include create, update and deletestamps
@@ -244,7 +243,8 @@ class View(Base):
         (0, "INVISIBLE"),
         (1, "TAB"), # selectable in view tabs
         (2, "TAB NO DESELECT"),
-        (3, "RADIO") # (layers) selectable only in radio button group
+        (3, "RADIO"), # (layers) selectable only in radio button group
+        (4, "INVISIBLE_STATIC_LAYER")
     )
 
     # the name of the predefined view
@@ -264,6 +264,8 @@ class View(Base):
     concurrent_views = models.ManyToManyField("self", blank=True)
     
     visibility = models.PositiveIntegerField(choices=VISIBILITY_CHOICES, default=1)
+    
+    order = models.PositiveIntegerField(default=0)
     
     def concurrents_as_json(self):
         js = json.dumps(list(self.concurrent_views.all().values_list("id")))
@@ -358,7 +360,7 @@ class Signature(Base):
     max_value = models.TextField(null=True, default=0)
     
     # label to display -- translation?
-    label = models.TextField(default="<empty>")
+    label = models.TextField(default="<empty>", null=True, blank=True)
     
     # line weight ("WEIGHT")
     stroke = models.IntegerField(null=True)
@@ -384,6 +386,22 @@ class Signature(Base):
     stroke_opacity = models.FloatField(null=True)
     
     hover = models.BooleanField(default=False)
+    
+    def to_svg(self):
+        svg = "<svg width='2rem' height='2rem' viewBox='0 0 24 12'><line x1='0' x2='32' y1='6' y2='6' style='"
+        
+        if self.stroke_color is not None:
+            svg += "stroke: " + self.stroke_color + ";"
+            
+        if self.stroke is not None:
+            svg += "stroke-width: " + str(self.stroke) + ";"
+            
+        if self.dash_array is not None:
+            svg += "stroke-dasharray: " + self.dash_array + ";"
+            
+        svg += "'/></svg>"
+        
+        return svg
     
     def values_as_json(self):
         values = [self.min_value]
@@ -479,11 +497,14 @@ class Statistic(Base):
     # view
     view = models.ForeignKey(View, on_delete=models.PROTECT)
     
+    # view to filter by
+    filter_view = models.ForeignKey(View, on_delete=models.PROTECT, null=True, related_name="filter_view")
+    
     def get_json(self):
         attribute_values = AttributeValue.objects.filter(attribute=self.attribute.id).order_by("id").values_list(self.attribute.type_to_column(), flat=True)
         group_by_values = AttributeValue.objects.filter(attribute=self.group_by_attribute.id).order_by("id").values_list(self.group_by_attribute.type_to_column(), flat=True)
         
-        output = {"options": {"type": self.type, "absolute": self.absolute, "selection": self.selection_attribute.name, "view": self.view.id}}
+        output = {"options": {"type": self.type, "absolute": self.absolute, "selection": self.selection_attribute.name, "view": self.view.id, "filterView": self.filter_view.id if self.filter_view is not None else None}}
         output["values"] = list(zip(group_by_values, attribute_values))
         
         return output

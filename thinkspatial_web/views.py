@@ -33,7 +33,7 @@ def index(request, template=None):
     # get the associated layers & predefined views
     layers = Layer.objects.filter(project=project, enabled=True)
     views = {}
-    for view in View_Layer.objects.filter(layer__in=layers, layer__project=project).values_list("view", flat=True):
+    for view in View_Layer.objects.filter(layer__in=layers, layer__project=project).order_by("order").values_list("view", flat=True):
         view = View.objects.get(pk=view)
         views[view.id] = view
     

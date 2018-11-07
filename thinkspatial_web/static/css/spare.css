@@ -53,19 +53,22 @@ div.legend div.legend-tabs span:hover {
 }
 div.legend div.legend-container {
   width: 100%;
-  display: table;
   box-sizing: border-box;
   padding: 0 1rem;
 }
 div.legend div.legend-container > span {
   font: 14px/16px Arial, Helvetica, sans-serif;
 }
-div.legend div.legend-container div.signature {
+div.legend div.legend-container div.signatures {
+  display: table;
+  width: 100%;
+}
+div.legend div.legend-container div.signatures div.signature {
   width: 100%;
   display: table-row;
 }
-div.legend div.legend-container div.signature svg,
-div.legend div.legend-container div.signature span {
+div.legend div.legend-container div.signatures div.signature svg,
+div.legend div.legend-container div.signatures div.signature span {
   display: table-cell;
   vertical-align: middle;
 }
