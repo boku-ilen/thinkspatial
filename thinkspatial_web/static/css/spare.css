@@ -56,6 +56,9 @@ div.legend div.legend-container {
   box-sizing: border-box;
   padding: 0 1rem;
 }
+div.legend div.legend-container:first-of-type {
+  padding-top: 1rem;
+}
 div.legend div.legend-container > span {
   font: 14px/16px Arial, Helvetica, sans-serif;
 }
@@ -72,8 +75,13 @@ div.legend div.legend-container div.signatures div.signature span {
   display: table-cell;
   vertical-align: middle;
 }
+div.legend div.legend-container div.signatures div.signature svg.active,
+div.legend div.legend-container div.signatures div.signature span.active {
+  background-color: white;
+  color: black;
+}
 div.legend div.stackedChart {
-  margin: 0.5rem 1rem;
+  margin: 0.5rem 0;
   clear: both;
   border: 1px solid #fff;
 }

@@ -36,7 +36,7 @@
             {% if view2 == id %}
                 {% for signature in signature1  %}
                 {% if not forloop.first %}, {% endif %}
-                { {% if signature.label is not None %} label: "{{ signature.label }}",{% endif %}
+                { {% if signature.label is not None %} label: "{{ signature.label | safe }}",{% endif %}
                 {% if signature.stroke is not None %} weight: {{ signature.stroke }},{% endif %}
                 {% if signature.dash_array is not None %} dashArray: "{{ signature.dash_array }}",{% endif %}
                 {% if signature.stroke_color is not None %} color: "{{ signature.stroke_color }}",{% endif %}

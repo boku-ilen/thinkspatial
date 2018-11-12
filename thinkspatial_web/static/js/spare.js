@@ -4,24 +4,26 @@ $(document).ready(function () {
     initLeaflet();
 });
 
-var initStackedBarChart = {
+var StackedBarChart = {
     create: function (statistic, key) {
-        var self = this, data = statistic.values[key], sum = 0,
-                signatures = views[statistic.options.view].signatures;
-        $.each(Object.values(data), function (i, x) {
+        var self = this, sum = 0;
+
+        statistic.filter(key);
+
+        $.each(Object.values(statistic.filteredValues), function (i, x) {
             sum += x;
         });
 
-        var dataArray = $.map(data, function (val, i) {
+        var dataArray = $.map(statistic.filteredValues, function (val, i) {
             var object = {};
             object[i] = val;
             return [[i, val]];
         });
 
-        var width = $(".legend-container").innerWidth();
+        var width = $(".signatures").width();
         var xScale = d3.scaleLinear().range([0, width]).domain([0, sum]);
 
-        var div = d3.select("div.legend div.legend-container[data-view='" + statistic.options.view + "']").insert("div", "div.signatures").attr("class", "stackedChart")
+        var div = d3.select("div.legend div.legend-container[data-view='" + statistic.view + "']").insert("div", "div.signatures").attr("class", "stackedChart")
                 .style("width", width + "px").style("height", rem2px(1) + "px");
 
         var xPos = 0;
@@ -30,52 +32,20 @@ var initStackedBarChart = {
                     return xScale(d[1]) + "px";
                 }).style("height", rem2px(1) + "px")
                 .style("background-color", function (d) {
-                    var signature = self.getSignature(d[0], signatures);
+                    var signature = statistic.getSignatureForValue(d[0]);
                     return signature.color;
                 }).text(function (d) {
-            if (statistic.options.absolute) {
+            if (statistic.absolute) {
                 return d[1];
             } else {
                 return Math.round(d[1] / sum * 100 * 100) / 100 + "%";
             }
         });
     },
-    getSignature: function (value, signatures) {
-        return signatures.filter(function (sig) {
-            if (typeof sig.values[0] === "string") {
-                return sig.values.indexOf(value) > -1;
-            } else if (typeof sig.values[0] === "number") {
-                if (sig.values.length === 1) {
-                    return sig.values[0] === Number(value);
-                } else {
-                    return sig.values[0] <= Number(value) && Number(value) <= sig.values[1];
-                }
-            }
-        })[0];
-    },
     removeCharts: function () {
         $("div.legend div.stackedChart").remove();
     }
 };
-
-function countUnique(data) {
-    var counts = {};
-
-    $.each(data, function (i, values) {
-        if (counts[values[0]]) {
-            if (counts[values[0]][values[1]]) {
-                counts[values[0]][values[1]]++;
-            } else {
-                counts[values[0]][values[1]] = 1;
-            }
-        } else {
-            counts[values[0]] = {};
-            counts[values[0]][values[1]] = 1;
-        }
-    });
-
-    return counts;
-}
 
 function getLayers() {
     var i = 1;
@@ -104,7 +74,7 @@ function getLayers() {
                         if (i === 0) {
                             statistics[layer.name] = [];
                         }
-                        statistics[layer.name].push({"options": stat.options, "values": countUnique(stat.values)});
+                        statistics[layer.name].push(new Statistic(stat.options, stat.values));
                     });
                 }
                 leafletLayers[id] = initGeoJSON(layer, data.geometry);
@@ -194,12 +164,18 @@ function initGeoJSON(layer, data) {
                 l.on("mouseover", function () {
                     if (!layerClicked) {
                         $.each(stats, function (i, statistic) {
-                            if (statistic.options.view === legend.selectedView) {
-                                initStackedBarChart.create(statistic, f.properties[statistic.options.selection]);
+                            if (statistic.view === legend.selectedView ||
+                                    views[legend.selectedView].concurrents.indexOf(statistic.view) >= 0) {
+                                if (i === 0)
+                                    StackedBarChart.removeCharts();
+                                StackedBarChart.create(statistic, f.properties[statistic.selection]);
 
                                 l.on("mouseout", function () {
-                                    if (!layerClicked)
-                                        initStackedBarChart.removeCharts();
+                                    if (!layerClicked) {
+                                        if (i === 0)
+                                            StackedBarChart.removeCharts();
+                                        StackedBarChart.create(statistic, null);
+                                    }
                                 });
                             }
                         });
@@ -329,7 +305,7 @@ function updateVisibleLayers() {
  * Legend-Class (ES5)
  */
 
-function Legend() {
+var Legend = function () {
     //add overlay to map
 
     var control = L.control({position: "bottomright"});
@@ -344,8 +320,7 @@ function Legend() {
     this.views;
 
     this.init();
-}
-;
+};
 
 Legend.prototype.constructor = Legend;
 
@@ -353,20 +328,20 @@ Legend.prototype.init = function () {
     //add tab for every view of type 1
 
     this.$legend.append($("<div>").addClass("legend-tabs"));
-    var _self = this;
+    var _this = this;
 
     $.each(views, function (i, view) {
         if ([1, 2].indexOf(view.visibility) >= 0) {
-            _self.$legend.children("div.legend-tabs").append($("<span>").text(view.name).attr("data-view", i));
+            _this.$legend.children("div.legend-tabs").append($("<span>").text(view.name).attr("data-view", i));
         }
     });
 
     this.$legend.on("click", "div.legend-tabs span", function () {
-        _self.$legend.find("span.active").removeClass("active");
+        _this.$legend.find("span.active").removeClass("active");
         $(this).addClass("active");
 
-        _self.selectedView = $(this).data("view");
-        _self.update();
+        _this.selectedView = $(this).data("view");
+        _this.update();
     });
 
     this.$legend.find("div.legend-tabs span").first().click();
@@ -377,9 +352,38 @@ Legend.prototype.addViewSignatures = function (view) {
     $container.append($("<span>").text(view.name));
     $container.append($("<div>").addClass("signatures"));
 
+    var filterStatistics = [];
+
+    $.each(statistics, function (layer, statistics) {
+        $.each(statistics, function (i, statistic) {
+            if (statistic.filterView === view.id) {
+                filterStatistics.push(statistic);
+            }
+        });
+    });
+
     $.each(view.signatures, function (i, signature) {
         var $signature = $("<div>").addClass("signature");
-        $signature.append(signature.svg, $("<span>").text(signature.label));
+        $signature.append(signature.svg);
+
+        var span = $("<span>").text(signature.label);
+
+        $.each(filterStatistics, function (i, statistic) {
+            span.on("click", function () {
+                var $this = $(this);
+
+                if ($this.hasClass("active")) {
+                    $this.removeClass("active");
+                    statistic.filterValue = null;
+                } else {
+                    $this.closest("div.signatures").find("span.active").removeClass("active");
+                    $this.addClass("active");
+                    statistic.filterValue = signature.values[0];
+                }
+            });
+        });
+
+        $signature.append(span);
         $signature.appendTo($container.find(".signatures"));
     });
 
@@ -404,9 +408,9 @@ Legend.prototype.addViewRadioButtons = function (view) {
 
     var $selected = this.$inputs.find("[name=" + view.id + "]:checked");
     if ($selected.length === 1) {
-        $container.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("checked", true);
+        $container.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("checked", true).change();
     } else {
-        $container.find("[name=" + view.id + "]").first().prop("checked", true).change();//
+        $container.find("[name=" + view.id + "]").first().prop("checked", true).change();
     }
 
     this.$legend.append($container);
@@ -418,7 +422,7 @@ Legend.prototype.clear = function () {
 
 Legend.prototype.update = function () {
     this.updateViews();
-    var _self = this;
+    var _this = this;
 
     this.$inputs = this.$legend.find("input").clone();
     this.clear();
@@ -428,26 +432,27 @@ Legend.prototype.update = function () {
             case 0:
             case 1:
             case 2:
-                _self.addViewSignatures(view);
+                _this.addViewSignatures(view);
                 break;
             case 3:
-                _self.addViewRadioButtons(view);
+                _this.addViewRadioButtons(view);
                 break;
         }
     });
 };
 
 Legend.prototype.updateViews = function () {
-    this.views = [];
     var viewId = this.selectedView;
-    var _self = this, j = 0;
+    this.views = [views[this.selectedView]];
+    var _this = this, j = 0;
 
     $.each(views, function (i, view) {
-        if (view.id === viewId ||
-                (_self.views[0] && _self.views[0].concurrents.indexOf(view.id) >= 0) ||
+        if (view.id === _this.selectedView ||
+                _this.views[0].concurrents.indexOf(view.id) >= 0 ||
                 [3, 4].indexOf(view.visibility) >= 0) {
             updateStyles(view.id, view.type, view.signatures, j);
-            _self.views.push(view);
+            if (view.id !== _this.selectedView)
+                _this.views.push(view);
             j++;
         }
     });
@@ -457,14 +462,56 @@ Legend.prototype.updateViews = function () {
  * Statistic-Class (ES5)
  */
 
-var Statistic = function () {
+var Statistic = function (options, values) {
+    this.absolute = options.absolute;
+    this.filterView = options.filterView;
+    this.selection = options.selection;
+    this.type = options.type;
+    this.view = options.view;
+    this.values = values;
 
+    this.signatures = views[this.view].signatures;
+
+    this.filteredValues = {};
+    this.filterValue = null;
 };
 
-Statistic.prototype.init = function () {
+Statistic.prototype.constructor = Statistic;
 
+Statistic.prototype.filter = function (key) {
+    var counts = {}, _this = this;
+
+    $.each(_this.values, function (i, values) {
+        if (key !== null && values[0] !== key) {
+            return true;
+        }
+
+        if (_this.filterValue !== null && values[2] !== _this.filterValue) {
+            return true;
+        }
+
+        var signature = _this.getSignatureForValue(values[1]);
+
+        if (counts[signature.values[0]]) {
+            counts[signature.values[0]]++;
+        } else {
+            counts[signature.values[0]] = 1;
+        }
+    });
+
+    this.filteredValues = counts;
 };
 
-Statistic.prototype.filter = function () {
-
+Statistic.prototype.getSignatureForValue = function (value) {
+    return this.signatures.filter(function (sig) {
+        if (typeof sig.values[0] === "string") {
+            return sig.values.indexOf(value) > -1;
+        } else if (typeof sig.values[0] === "number") {
+            if (sig.values.length === 1) {
+                return sig.values[0] === Number(value);
+            } else {
+                return sig.values[0] <= Number(value) && Number(value) <= sig.values[1];
+            }
+        }
+    })[0];
 };
