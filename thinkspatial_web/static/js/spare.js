@@ -91,7 +91,14 @@ function getLayers() {
 
                 if (i === Object.keys(layers).length) {
                     legend = new Legend();
-                    $(".disclaimer-modal").hide();
+                    if ($("button#closeDisclaimer").length >= 0) {
+                        $("button#closeDisclaimer").prop("disabled", false);
+                        $("button#closeDisclaimer").on("click", function () {
+                            $(".disclaimer-modal").hide();
+                        });
+                    } else {
+                        $(".disclaimer-modal").hide();
+                    }
                 } else {
                     i++;
                 }
@@ -99,7 +106,14 @@ function getLayers() {
             error: function (jqXHR, textStatus, errorThrown) {
                 if (i === Object.keys(layers).length) {
                     legend = new Legend();
-                    $(".disclaimer-modal").hide();
+                    if ($("button#closeDisclaimer").length >= 0) {
+                        $("button#closeDisclaimer").prop("disabled", false);
+                        $("button#closeDisclaimer").on("click", function () {
+                            $(".disclaimer-modal").hide();
+                        });
+                    } else {
+                        $(".disclaimer-modal").hide();
+                    }
                 } else {
                     i++;
                 }

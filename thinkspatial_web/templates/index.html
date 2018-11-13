@@ -70,10 +70,11 @@
 <!-- TODO: disable/enable based on project and/or deployment settings -->
 <div class="disclaimer-modal">
     <div class="disclaimer">
-        {% if project_disclaimer %}
-        <p>{{ project_disclaimer }}</p>
-        {% endif %}
         <progress value="0" max="100"></progress>
+        {% if project_disclaimer is not None %}
+        <div class="disclaimer-container">{{ project_disclaimer | safe }}</div>
+        <button type="button" id="closeDisclaimer" disabled>OK</button>
+        {% endif %}
     </div>
 </div>
 
