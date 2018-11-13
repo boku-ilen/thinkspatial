@@ -24,6 +24,20 @@ div.disclaimer-modal div.disclaimer {
   left: 50vw;
   transform: translateX(-50%) translateY(-50%);
 }
+div.disclaimer-modal div.disclaimer progress {
+  width: 100%;
+}
+div.disclaimer-modal div.disclaimer div.disclaimer-container {
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  background-color: #eee;
+  border-radius: 5px;
+  width: 100%;
+  height: 30vh;
+  overflow-y: scroll;
+  margin: 1rem 0;
+  padding: 1rem;
+}
 div#map {
   width: 100vw;
   height: 100vh;
@@ -56,6 +70,12 @@ div.legend div.legend-container {
   box-sizing: border-box;
   padding: 0 1rem;
 }
+div.legend div.legend-container:nth-child(2) {
+  padding-top: 1rem;
+}
+div.legend div.legend-container:last-child {
+  padding-bottom: 1rem;
+}
 div.legend div.legend-container > span {
   font: 14px/16px Arial, Helvetica, sans-serif;
 }
@@ -72,8 +92,13 @@ div.legend div.legend-container div.signatures div.signature span {
   display: table-cell;
   vertical-align: middle;
 }
+div.legend div.legend-container div.signatures div.signature svg.active,
+div.legend div.legend-container div.signatures div.signature span.active {
+  background-color: white;
+  color: black;
+}
 div.legend div.stackedChart {
-  margin: 0.5rem 1rem;
+  margin: 0.5rem 0;
   clear: both;
   border: 1px solid #fff;
 }

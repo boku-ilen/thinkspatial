@@ -36,7 +36,7 @@
             {% if view2 == id %}
                 {% for signature in signature1  %}
                 {% if not forloop.first %}, {% endif %}
-                { {% if signature.label is not None %} label: "{{ signature.label }}",{% endif %}
+                { {% if signature.label is not None %} label: "{{ signature.label | safe }}",{% endif %}
                 {% if signature.stroke is not None %} weight: {{ signature.stroke }},{% endif %}
                 {% if signature.dash_array is not None %} dashArray: "{{ signature.dash_array }}",{% endif %}
                 {% if signature.stroke_color is not None %} color: "{{ signature.stroke_color }}",{% endif %}
@@ -70,10 +70,11 @@
 <!-- TODO: disable/enable based on project and/or deployment settings -->
 <div class="disclaimer-modal">
     <div class="disclaimer">
-        {% if project_disclaimer %}
-        <p>{{ project_disclaimer }}</p>
-        {% endif %}
         <progress value="0" max="100"></progress>
+        {% if project_disclaimer is not None %}
+        <div class="disclaimer-container">{{ project_disclaimer | safe }}</div>
+        <button type="button" id="closeDisclaimer" disabled>OK</button>
+        {% endif %}
     </div>
 </div>
 
