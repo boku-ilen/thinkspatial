@@ -388,7 +388,7 @@ class Signature(Base):
     hover = models.BooleanField(default=False)
     
     def to_svg(self):
-        svg = "<svg width='2rem' height='2rem' viewBox='0 0 24 12'><line x1='0' x2='32' y1='6' y2='6' style='"
+        svg = "<svg width='32px' height='32px' viewBox='0 0 24 12'><line x1='0' x2='32' y1='6' y2='6' style='"
         
         if self.stroke_color is not None:
             svg += "stroke: " + self.stroke_color + ";"

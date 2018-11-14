@@ -105,3 +105,12 @@ div.legend div.stackedChart {
 div.legend div.stackedChart div {
   float: left;
 }
+div.fullScreenControl a {
+  background-image: url(../images/project_icons/fullScreenOn.svg);
+  background-size: cover;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+div.fullScreenControl a.off {
+  background-image: url(../images/project_icons/fullScreenOff.svg);
+}
