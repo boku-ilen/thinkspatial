@@ -17,7 +17,7 @@ class Base(models.Model):
         abstract = True
 
 
-#
+# the settings of the different basemaps which can possibly used to display a project
 class Basemap(Base):
 
     # the name of the basemap
