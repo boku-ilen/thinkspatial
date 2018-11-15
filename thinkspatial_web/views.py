@@ -130,11 +130,11 @@ def generate_layer_json(layer):
         # TODO: add crs?
 
         logger.debug("startup time: {}ms".format(time.time() - start))
-        geometries = Geometry.objects.filter(layer=lyr).order_by("id")[0:500]  #, geom__within=boundingbox
+        geometries = Geometry.objects.filter(layer=lyr).order_by("id")  #, geom__within=boundingbox
         logger.debug("geometries load time: {}ms (suspected to be lazy loaded)".format(time.time() - start))
         attributes = get_attributes(lyr.id)
         views = attributes[1]
-        attributes = attributes[0][0:500]
+        attributes = attributes[0]
 
         # get geometry and properties from all attributes which are referenced in prepared views
         for index, geometry in enumerate(geometries):
