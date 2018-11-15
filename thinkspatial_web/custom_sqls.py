@@ -3,15 +3,20 @@ from django.db import connection
 
 def get_attributes(layer):
     with connection.cursor() as cursor:
-        cursor.execute("""SELECT DISTINCT a."attribute" FROM
-                            (SELECT v.attribute_id AS "attribute" FROM thinkspatial_web_view_layer v
+        cursor.execute("""SELECT DISTINCT a.attribute FROM
+                            ((SELECT v.attribute_id AS "attribute" FROM thinkspatial_web_view_layer v
                             WHERE v.layer_id = %s
 
                             UNION ALL
 
                             SELECT a.id AS "attribute" FROM thinkspatial_web_attribute a
                             JOIN thinkspatial_web_statistic s ON a.id = s.selection_attribute_id
-                            WHERE a.layer_id = %s) a""", [layer, layer])
+                            WHERE a.layer_id = %s)
+                            
+                            UNION ALL
+
+                            SELECT l.info_attribute_id AS "attribute" FROM thinkspatial_web_layer l
+                            WHERE l.id = %s) a""", [layer, layer, layer])
         
         attributes = [t[0] for t in cursor.fetchall()]
         

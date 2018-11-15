@@ -1,4 +1,4 @@
-var map, layerControl, leafletLayers = {}, legend, info, rawStatistics, statistics = {}, layerClicked = false;
+var map, layerControl, leafletLayers = {}, legend, info, rawStatistics, statistics = {}, clickedLayer = null;
 
 $(document).ready(function () {
     initLeaflet();
@@ -97,7 +97,6 @@ function getLayers() {
                 if (i === Object.keys(layers).length) {
                     legend = new Legend();
                     legend.init();
-                    info = new Info();
                     if ($("button#closeDisclaimer").length >= 0) {
                         $("button#closeDisclaimer").prop("disabled", false);
                         $("button#closeDisclaimer").on("click", function () {
@@ -114,7 +113,6 @@ function getLayers() {
                 if (i === Object.keys(layers).length) {
                     legend = new Legend();
                     legend.init();
-                    info = new Info();
                     if ($("button#closeDisclaimer").length >= 0) {
                         $("button#closeDisclaimer").prop("disabled", false);
                         $("button#closeDisclaimer").on("click", function () {
@@ -322,16 +320,24 @@ function updateStyles(view, type, signatures, i) {
                         } else if (signature.hover) {
                             var originalStyle = getStyle(l);
                             l.on("mouseover", function () {
-                                if (!layerClicked)
-                                    l.setStyle(style);
+                                l.setStyle(style);
 
                                 l.on("click", function () {
-                                    layerClicked = !layerClicked;
-                                    updateStatistics(layerId, layerClicked ? l : false);
+                                    if (clickedLayer !== null && clickedLayer !== l) {
+                                        clickedLayer.fire("click");
+                                        clickedLayer = l;
+                                    } else if (clickedLayer === l) {
+                                        clickedLayer = null;
+                                        l.setStyle(originalStyle);
+                                    } else if (clickedLayer === null) {
+                                        clickedLayer = l;
+                                    }
+
+                                    updateStatistics(layerId, clickedLayer ? l : false);
                                 });
 
                                 l.on("mouseout", function () {
-                                    if (!layerClicked)
+                                    if (clickedLayer !== l)
                                         l.setStyle(originalStyle);
                                 });
                             });
@@ -354,10 +360,15 @@ function updateVisibleLayers() {
         }
     });
 
-    layerClicked = false;
+    clickedLayer = null;
     leafletLayers[layerId].addTo(map);
 
+    leafletLayers[Object.keys(layers)[0]].bringToFront();
+
     updateStatistics(layerId, null);
+
+    if (info)
+        info.update();
 }
 
 /*
@@ -400,6 +411,9 @@ Legend.prototype.init = function () {
     });
 
     this.$legend.find("div.legend-tabs span").first().click();
+
+    info = new Info();
+    info.update();
 };
 
 Legend.prototype.addViewSignatures = function (view) {
@@ -435,7 +449,7 @@ Legend.prototype.addViewSignatures = function (view) {
                     $this.removeClass("active");
                     statistic.filterValue = null;
                 } else {
-                    $this.closest("div.signatures").find("span.active").removeClass("active");
+                    $("div.legend div.signatures span.active").click();
                     $this.addClass("active");
                     statistic.filterValue = signature.values[0];
                 }
@@ -496,6 +510,7 @@ Legend.prototype.update = function () {
             case 0:
             case 1:
             case 2:
+            case 5:
                 _this.addViewSignatures(view);
                 break;
             case 3:
@@ -513,7 +528,7 @@ Legend.prototype.updateViews = function () {
     $.each(views, function (i, view) {
         if (view.id === _this.selectedView ||
                 _this.views[0].concurrents.indexOf(view.id) >= 0 ||
-                [3, 4].indexOf(view.visibility) >= 0) {
+                [3, 4, 5].indexOf(view.visibility) >= 0) {
             updateStyles(view.id, view.type, view.signatures, j);
             if (view.id !== _this.selectedView)
                 _this.views.push(view);
@@ -605,20 +620,34 @@ var Info = function () {
 
 Info.prototype.constructor = Info;
 
-Info.prototype.updateInfo = function (feature) {
-    
+Info.prototype.update = function () {
+    this.updateViews();
+    this.updateLayers();
 };
 
 Info.prototype.updateLayers = function () {
     var _this = this;
-    
-    $.each(this.layerViews, function(layerId, views) {
-        leafletLayers[layerId].each(function(layer) {
+
+    $.each(this.layerViews, function (layerId, _views) {
+        leafletLayers[layerId].eachLayer(function (layer) {
             layer.off("mouseover");
             layer.off("mouseout");
-            
+
             layer.on("mouseover", function () {
-                //TODO
+                _this.$info.append($("<strong>").text(layer.feature.properties[layers[layerId].infoAttribute]));
+
+                $.each(_views, function (viewId, view) {
+                    var signature = _this.getSignatureForValue(layer.feature.properties[view.attribute], views[viewId].signatures);
+                    if (signature) {
+                        _this.$info.append($("<p>").text(views[viewId].name + ": "
+                                + layer.feature.properties[view.attribute] + " // "
+                                + signature.label));
+                    }
+                });
+            });
+
+            layer.on("mouseout", function () {
+                _this.$info.empty();
             });
         });
     });
@@ -641,11 +670,25 @@ Info.prototype.updateViews = function () {
         $.each(_this.views, function (j, view) {
             if (Object.keys(layerView).indexOf(view.id.toString()) >= 0) {
                 if (!_this.layerViews[i]) {
-                    _this.layerViews[i] = [];
+                    _this.layerViews[i] = {};
                 }
-                
-                _this.layerViews[i].push(view.id);
+
+                _this.layerViews[i] = layerView;
             }
         });
     });
+};
+
+Info.prototype.getSignatureForValue = function (value, signatures) {
+    return signatures.filter(function (sig) {
+        if (typeof sig.values[0] === "string") {
+            return sig.values.indexOf(value) > -1;
+        } else if (typeof sig.values[0] === "number") {
+            if (sig.values.length === 1) {
+                return sig.values[0] === Number(value);
+            } else {
+                return sig.values[0] <= Number(value) && Number(value) <= sig.values[1];
+            }
+        }
+    })[0];
 };

@@ -116,7 +116,9 @@ class Layer(Base):
 
     # enabled
     enabled = models.BooleanField(default=True)
-
+    
+    # attribute to display in info box during mouseover (optional)
+    info_attribute = models.ForeignKey("Attribute", on_delete=models.PROTECT, null=True, blank=True, related_name="info_attribute")
 
     @staticmethod
     def to_geometry_type(type):
@@ -244,7 +246,8 @@ class View(Base):
         (1, "TAB"), # selectable in view tabs
         (2, "TAB NO DESELECT"),
         (3, "RADIO"), # (layers) selectable only in radio button group
-        (4, "INVISIBLE_STATIC_LAYER")
+        (4, "INVISIBLE_STATIC_LAYER"),
+        (5, "VISIBLE_STATIC_LAYER")
     )
 
     # the name of the predefined view
