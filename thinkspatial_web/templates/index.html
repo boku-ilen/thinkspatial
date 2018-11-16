@@ -30,7 +30,9 @@
     var views = {
     {% for id, view1 in views.items %}
     {% if not forloop.first %}, {% endif %}
-    {{ id }}: {id: {{ id }}, name: "{{ view1.name }}", concurrents: {{ view1.concurrents_as_json }} , type: {{ view1.signature_type }}, visibility: {{ view1.visibility }},
+    {{ id }}: {id: {{ id }}, name: "{{ view1.name }}", concurrents: {{ view1.concurrents_as_json }}, 
+        type: {{ view1.signature_type }}, visibility: {{ view1.visibility }},
+        legendTabOrder: {{ view1.legend_tab_order }}, legendOrder: {{ view1.legend_order }},
         signatures: [
             {% for view2, signature1 in signatures.items %}
             {% if view2 == id %}

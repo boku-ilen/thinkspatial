@@ -177,7 +177,6 @@ function initLeaflet() {
             if (document.exitFullscreen) {
                 document.exitFullscreen();
             } else if (document.webkitExitFullscreen) {
-                console.log("Hi");
                 document.webkitExitFullscreen();
             } else if (document.mozCancelFullScreen) {
                 document.mozCancelFullScreen();
@@ -319,28 +318,37 @@ function updateStyles(view, type, signatures, i) {
                             l.setStyle(style);
                         } else if (signature.hover) {
                             var originalStyle = getStyle(l);
-                            l.on("mouseover", function () {
+                            
+                            var mouseover = function () {
                                 l.setStyle(style);
+                            };
+                            
+                            var mouseout = function () {
+                                if (clickedLayer !== l)
+                                    l.setStyle(originalStyle);
+                            };
+                            
+                            l.off("mouseover", mouseover);
+                            l.off("mouseout", mouseout);
+                            l.off("click");
 
-                                l.on("click", function () {
-                                    if (clickedLayer !== null && clickedLayer !== l) {
-                                        clickedLayer.fire("click");
-                                        clickedLayer = l;
-                                    } else if (clickedLayer === l) {
-                                        clickedLayer = null;
-                                        l.setStyle(originalStyle);
-                                    } else if (clickedLayer === null) {
-                                        clickedLayer = l;
+                            l.on("mouseover", mouseover);
+
+                            l.on("click", function () {
+                                if (clickedLayer === l) {
+                                    clickedLayer = null;
+                                    l.setStyle(originalStyle);
+                                } else {
+                                    if (clickedLayer) {
+                                        clickedLayer.setStyle(originalStyle);
                                     }
+                                    clickedLayer = l;
+                                }
 
-                                    updateStatistics(layerId, clickedLayer ? l : false);
-                                });
-
-                                l.on("mouseout", function () {
-                                    if (clickedLayer !== l)
-                                        l.setStyle(originalStyle);
-                                });
+                                updateStatistics(layerId, clickedLayer ? l : false);
                             });
+
+                            l.on("mouseout", mouseout);
                         }
                     });
                 } else {
@@ -396,10 +404,20 @@ Legend.prototype.init = function () {
     this.$legend.append($("<div>").addClass("legend-tabs"));
     var _this = this;
 
+    var tabViews = [];
+
     $.each(views, function (i, view) {
         if ([1, 2].indexOf(view.visibility) >= 0) {
-            _this.$legend.children("div.legend-tabs").append($("<span>").text(view.name).attr("data-view", i));
+            tabViews.push(view);
         }
+    });
+
+    tabViews.sort(function (a, b) {
+        return a.legendTabSort - b.legendTabSort;
+    });
+
+    $.each(tabViews, function (i, view) {
+        _this.$legend.children("div.legend-tabs").append($("<span>").text(view.name).attr("data-view", view.id));
     });
 
     this.$legend.on("click", "div.legend-tabs span", function () {
@@ -425,7 +443,7 @@ Legend.prototype.addViewSignatures = function (view) {
 
     $.each(statistics, function (layer, statistics) {
         $.each(statistics, function (i, statistic) {
-            if (statistic.filterView === view.id) {
+            if (statistic.filterViews.indexOf(view.id) >= 0) {
                 filterStatistics.push(statistic);
             }
         });
@@ -482,13 +500,10 @@ Legend.prototype.addViewRadioButtons = function (view) {
     $container.on("change", "input", updateVisibleLayers);
 
     var $selected = this.$inputs.find("[name=" + view.id + "]:checked");
-    var layerId;
     if ($selected.length === 1) {
-        layerId = $selected.val();
-        $container.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("checked", true).change();
+        $container.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("checked", true);
     } else {
-        layerId = $container.find("[name=" + view.id + "]").first().val();
-        $container.find("[name=" + view.id + "]").first().prop("checked", true).change();
+        $container.find("[name=" + view.id + "]").first().prop("checked", true);
     }
 
     this.$legend.append($container);
@@ -518,6 +533,8 @@ Legend.prototype.update = function () {
                 break;
         }
     });
+    
+    this.$legend.find("input:checked").change();
 };
 
 Legend.prototype.updateViews = function () {
@@ -535,6 +552,10 @@ Legend.prototype.updateViews = function () {
             j++;
         }
     });
+    
+    this.views.sort(function(a, b) {
+        return a.legendOrder - b.legendOrder;
+    });
 };
 
 /*
@@ -543,7 +564,7 @@ Legend.prototype.updateViews = function () {
 
 var Statistic = function (options, values) {
     this.absolute = options.absolute;
-    this.filterView = options.filterView;
+    this.filterViews = options.filterViews;
     this.selection = options.selection;
     this.type = options.type;
     this.view = options.view;
@@ -576,10 +597,12 @@ Statistic.prototype.filter = function () {
 
         var signature = _this.getSignatureForValue(values[1]);
 
-        if (counts[signature.values[0]]) {
-            counts[signature.values[0]]++;
-        } else {
-            counts[signature.values[0]] = 1;
+        if (signature) {
+            if (counts[signature.values[0]]) {
+                counts[signature.values[0]]++;
+            } else {
+                counts[signature.values[0]] = 1;
+            }
         }
     });
 
@@ -587,7 +610,7 @@ Statistic.prototype.filter = function () {
 };
 
 Statistic.prototype.getSignatureForValue = function (value) {
-    return this.signatures.filter(function (sig) {
+    var signature = this.signatures.filter(function (sig) {
         if (typeof sig.values[0] === "string") {
             return sig.values.indexOf(value) > -1;
         } else if (typeof sig.values[0] === "number") {
@@ -598,6 +621,8 @@ Statistic.prototype.getSignatureForValue = function (value) {
             }
         }
     })[0];
+
+    return typeof signature === "undefined" ? false : signature;
 };
 
 /*
@@ -630,10 +655,7 @@ Info.prototype.updateLayers = function () {
 
     $.each(this.layerViews, function (layerId, _views) {
         leafletLayers[layerId].eachLayer(function (layer) {
-            layer.off("mouseover");
-            layer.off("mouseout");
-
-            layer.on("mouseover", function () {
+            var mouseover = function () {
                 _this.$info.append($("<strong>").text(layer.feature.properties[layers[layerId].infoAttribute]));
 
                 $.each(_views, function (viewId, view) {
@@ -644,11 +666,18 @@ Info.prototype.updateLayers = function () {
                                 + signature.label));
                     }
                 });
-            });
-
-            layer.on("mouseout", function () {
+            };
+            
+            var mouseout = function () {
                 _this.$info.empty();
-            });
+            };
+            
+            layer.off("mouseover", mouseover);
+            layer.off("mouseout", mouseout);
+
+            layer.on("mouseover", mouseover);
+
+            layer.on("mouseout", mouseout);
         });
     });
 };
@@ -659,7 +688,8 @@ Info.prototype.updateViews = function () {
     var _this = this;
 
     $.each(views, function (i, view) {
-        if (_this.views[legend.selectedView].concurrents.indexOf(view.id) >= 0) {
+        if (_this.views[legend.selectedView].concurrents.indexOf(view.id) >= 0 ||
+                view.visibility === 3) {
             _this.views[view.id] = view;
         }
     });

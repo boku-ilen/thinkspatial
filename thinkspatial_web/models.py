@@ -268,7 +268,9 @@ class View(Base):
     
     visibility = models.PositiveIntegerField(choices=VISIBILITY_CHOICES, default=1)
     
-    order = models.PositiveIntegerField(default=0)
+    legend_tab_order = models.PositiveIntegerField(default=0)
+    
+    legend_order = models.PositiveIntegerField(default=0)
     
     def concurrents_as_json(self):
         js = json.dumps(list(self.concurrent_views.all().values_list("id")))
@@ -501,17 +503,17 @@ class Statistic(Base):
     view = models.ForeignKey(View, on_delete=models.PROTECT)
     
     # view to filter by
-    filter_view = models.ForeignKey(View, on_delete=models.PROTECT, null=True, related_name="filter_view")
+    filter_views = models.ManyToManyField(View, related_name="filter_view")
     
     def get_json(self):
         attribute_values = AttributeValue.objects.filter(attribute=self.attribute.id).order_by("id").values_list(self.attribute.type_to_column(), flat=True)
         group_by_values = AttributeValue.objects.filter(attribute=self.group_by_attribute.id).order_by("id").values_list(self.group_by_attribute.type_to_column(), flat=True)
         
-        if self.filter_view is not None:
-            filter_attribute = Attribute.objects.filter(id__in=View_Layer.objects.filter(view=self.filter_view).values_list("attribute", flat=True))[0]
+        if self.filter_views is not None:
+            filter_attribute = Attribute.objects.filter(id__in=View_Layer.objects.filter(view__in=self.filter_views.all()).values_list("attribute", flat=True))[0]
             filter_values = AttributeValue.objects.filter(attribute=filter_attribute).order_by("id").values_list(filter_attribute.type_to_column(), flat=True)
         
-        output = {"options": {"type": self.type, "absolute": self.absolute, "selection": self.selection_attribute.name, "view": self.view.id, "filterView": self.filter_view.id if self.filter_view is not None else None}}
+        output = {"options": {"type": self.type, "absolute": self.absolute, "selection": self.selection_attribute.name, "view": self.view.id, "filterViews": list(self.filter_views.all().values_list("id", flat=True))}}
         output["values"] = list(zip(group_by_values, attribute_values, filter_values))
         
         return output
