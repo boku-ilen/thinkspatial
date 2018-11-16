@@ -1,14 +1,19 @@
-var map, layerControl, leafletLayers = {}, legend, rawStatistics, statistics = {}, layerClicked = false;
+var map, layerControl, leafletLayers = {}, legend, info, rawStatistics, statistics = {}, clickedLayer = null;
 
 $(document).ready(function () {
     initLeaflet();
+
+    $(window).on("resize", function () {
+        if (legend)
+            updateStatistics(legend.$legend.find("input:checked").val(), null);
+    });
 });
 
 var StackedBarChart = {
-    create: function (statistic, key) {
+    create: function (statistic) {
         var self = this, sum = 0;
 
-        statistic.filter(key);
+        statistic.filter();
 
         $.each(Object.values(statistic.filteredValues), function (i, x) {
             sum += x;
@@ -77,7 +82,7 @@ function getLayers() {
                         statistics[layer.name].push(new Statistic(stat.options, stat.values));
                     });
                 }
-                leafletLayers[id] = initGeoJSON(layer, data.geometry);
+                leafletLayers[id] = initGeoJSON(data.geometry);
 
                 var _views = getViewsByLayerId(id), len = _views.length, j = 0;
 
@@ -91,6 +96,7 @@ function getLayers() {
 
                 if (i === Object.keys(layers).length) {
                     legend = new Legend();
+                    legend.init();
                     if ($("button#closeDisclaimer").length >= 0) {
                         $("button#closeDisclaimer").prop("disabled", false);
                         $("button#closeDisclaimer").on("click", function () {
@@ -106,6 +112,7 @@ function getLayers() {
             error: function (jqXHR, textStatus, errorThrown) {
                 if (i === Object.keys(layers).length) {
                     legend = new Legend();
+                    legend.init();
                     if ($("button#closeDisclaimer").length >= 0) {
                         $("button#closeDisclaimer").prop("disabled", false);
                         $("button#closeDisclaimer").on("click", function () {
@@ -156,10 +163,45 @@ function initLeaflet() {
 
     initLayerControl();
 
+    var fullScreenControl = L.control({position: "topright"});
+    fullScreenControl.onAdd = function () {
+        var div = L.DomUtil.create("div", "leaflet-bar fullScreenControl");
+        var a = L.DomUtil.create("a", null, div);
+
+        return div;
+    };
+    fullScreenControl.addTo(map);
+
+    $("div.fullScreenControl a").on("click", function () {
+        if ($(this).hasClass("off")) {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            } else if (document.webkitExitFullscreen) {
+                document.webkitExitFullscreen();
+            } else if (document.mozCancelFullScreen) {
+                document.mozCancelFullScreen();
+            } else if (document.msExitFullscreen) {
+                document.msExitFullscreen();
+            }
+            $(this).removeClass("off");
+        } else {
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen();
+            } else if (document.documentElement.mozRequestFullScreen) {
+                document.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                document.documentElement.msRequestFullscreen();
+            }
+            $(this).addClass("off");
+        }
+    });
+
     getLayers();
 }
 
-function initGeoJSON(layer, data) {
+function initGeoJSON(data) {
     return L.geoJson(data, {
         pointToLayer: function (feature, latlng) {
             var iconSize = Math.round(feature.properties.size / 1);
@@ -170,32 +212,6 @@ function initGeoJSON(layer, data) {
                 popupAnchor: [0, -1 * (iconSize / 2)] // point from which the popup should open relative to the iconAnchor
             });
             return new L.Marker(latlng, {icon: smallIcon, opacity: 0.85});
-        },
-
-        onEachFeature: function (f, l) {
-            if (layer.hasStatistics) {
-                var stats = statistics[layer.name];
-                l.on("mouseover", function () {
-                    if (!layerClicked) {
-                        $.each(stats, function (i, statistic) {
-                            if (statistic.view === legend.selectedView ||
-                                    views[legend.selectedView].concurrents.indexOf(statistic.view) >= 0) {
-                                if (i === 0)
-                                    StackedBarChart.removeCharts();
-                                StackedBarChart.create(statistic, f.properties[statistic.selection]);
-
-                                l.on("mouseout", function () {
-                                    if (!layerClicked) {
-                                        if (i === 0)
-                                            StackedBarChart.removeCharts();
-                                        StackedBarChart.create(statistic, null);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
         }
     });
 
@@ -203,10 +219,12 @@ function initGeoJSON(layer, data) {
 }
 
 function initLayerControl() {
-    layerControl = L.control.layers(basemaps, null, {
-        hideSingleBase: true,
-        collapsed: false
-    }).addTo(map);
+    if (Object.keys(basemaps).length > 1) {
+        layerControl = L.control.layers(basemaps, null, {
+            hideSingleBase: true,
+            collapsed: false
+        }).addTo(map);
+    }
 
     // add default basemap to map and add all defined basemaps to the layer control widget
     if (Object.keys(basemaps).length > 0) {
@@ -221,6 +239,26 @@ function rem2px(rem) {
 function resetStroke() {
     stroke = Array.apply(null, Array(Object.keys(layer._layers).length)).map(function () {
         return true;
+    });
+}
+
+function updateStatistics(layerId, layer) {
+    var stats = statistics[layers[layerId].name];
+
+    if (stats.length > 0) {
+        StackedBarChart.removeCharts();
+    }
+
+    $.each(stats, function (i, statistic) {
+        if (statistic.view === legend.selectedView ||
+                views[legend.selectedView].concurrents.indexOf(statistic.view) >= 0) {
+            if (layer !== null && layer !== false) {
+                statistic.filterFeature = layer.feature;
+            } else if (layer === false) {
+                statistic.filterFeature = null;
+            }
+            StackedBarChart.create(statistic);
+        }
     });
 }
 
@@ -280,19 +318,37 @@ function updateStyles(view, type, signatures, i) {
                             l.setStyle(style);
                         } else if (signature.hover) {
                             var originalStyle = getStyle(l);
-                            l.on("mouseover", function () {
-                                if (!layerClicked)
-                                    l.setStyle(style);
+                            
+                            var mouseover = function () {
+                                l.setStyle(style);
+                            };
+                            
+                            var mouseout = function () {
+                                if (clickedLayer !== l)
+                                    l.setStyle(originalStyle);
+                            };
+                            
+                            l.off("mouseover", mouseover);
+                            l.off("mouseout", mouseout);
+                            l.off("click");
 
-                                l.on("click", function () {
-                                    layerClicked = !layerClicked;
-                                });
+                            l.on("mouseover", mouseover);
 
-                                l.on("mouseout", function () {
-                                    if (!layerClicked)
-                                        l.setStyle(originalStyle);
-                                });
+                            l.on("click", function () {
+                                if (clickedLayer === l) {
+                                    clickedLayer = null;
+                                    l.setStyle(originalStyle);
+                                } else {
+                                    if (clickedLayer) {
+                                        clickedLayer.setStyle(originalStyle);
+                                    }
+                                    clickedLayer = l;
+                                }
+
+                                updateStatistics(layerId, clickedLayer ? l : false);
                             });
+
+                            l.on("mouseout", mouseout);
                         }
                     });
                 } else {
@@ -312,7 +368,15 @@ function updateVisibleLayers() {
         }
     });
 
+    clickedLayer = null;
     leafletLayers[layerId].addTo(map);
+
+    leafletLayers[Object.keys(layers)[0]].bringToFront();
+
+    updateStatistics(layerId, null);
+
+    if (info)
+        info.update();
 }
 
 /*
@@ -320,8 +384,6 @@ function updateVisibleLayers() {
  */
 
 var Legend = function () {
-    //add overlay to map
-
     var control = L.control({position: "bottomright"});
     control.onAdd = function () {
         return L.DomUtil.create("div", "legend");
@@ -332,8 +394,6 @@ var Legend = function () {
     this.$inputs;
     this.selectedView;
     this.views;
-
-    this.init();
 };
 
 Legend.prototype.constructor = Legend;
@@ -344,10 +404,20 @@ Legend.prototype.init = function () {
     this.$legend.append($("<div>").addClass("legend-tabs"));
     var _this = this;
 
+    var tabViews = [];
+
     $.each(views, function (i, view) {
         if ([1, 2].indexOf(view.visibility) >= 0) {
-            _this.$legend.children("div.legend-tabs").append($("<span>").text(view.name).attr("data-view", i));
+            tabViews.push(view);
         }
+    });
+
+    tabViews.sort(function (a, b) {
+        return a.legendTabSort - b.legendTabSort;
+    });
+
+    $.each(tabViews, function (i, view) {
+        _this.$legend.children("div.legend-tabs").append($("<span>").text(view.name).attr("data-view", view.id));
     });
 
     this.$legend.on("click", "div.legend-tabs span", function () {
@@ -359,6 +429,9 @@ Legend.prototype.init = function () {
     });
 
     this.$legend.find("div.legend-tabs span").first().click();
+
+    info = new Info();
+    info.update();
 };
 
 Legend.prototype.addViewSignatures = function (view) {
@@ -366,11 +439,11 @@ Legend.prototype.addViewSignatures = function (view) {
     $container.append($("<span>").text(view.name));
     $container.append($("<div>").addClass("signatures"));
 
-    var filterStatistics = [];
+    var filterStatistics = [], _this = this;
 
     $.each(statistics, function (layer, statistics) {
         $.each(statistics, function (i, statistic) {
-            if (statistic.filterView === view.id) {
+            if (statistic.filterViews.indexOf(view.id) >= 0) {
                 filterStatistics.push(statistic);
             }
         });
@@ -382,6 +455,10 @@ Legend.prototype.addViewSignatures = function (view) {
 
         var span = $("<span>").text(signature.label);
 
+        if (filterStatistics.length > 0) {
+            span.css("cursor", "pointer");
+        }
+
         $.each(filterStatistics, function (i, statistic) {
             span.on("click", function () {
                 var $this = $(this);
@@ -390,10 +467,12 @@ Legend.prototype.addViewSignatures = function (view) {
                     $this.removeClass("active");
                     statistic.filterValue = null;
                 } else {
-                    $this.closest("div.signatures").find("span.active").removeClass("active");
+                    $("div.legend div.signatures span.active").click();
                     $this.addClass("active");
                     statistic.filterValue = signature.values[0];
                 }
+
+                updateStatistics(_this.$legend.find("input:checked").val(), null);
             });
         });
 
@@ -422,9 +501,9 @@ Legend.prototype.addViewRadioButtons = function (view) {
 
     var $selected = this.$inputs.find("[name=" + view.id + "]:checked");
     if ($selected.length === 1) {
-        $container.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("checked", true).change();
+        $container.find("[name=" + view.id + "][value= " + $selected.val() + "]").prop("checked", true);
     } else {
-        $container.find("[name=" + view.id + "]").first().prop("checked", true).change();
+        $container.find("[name=" + view.id + "]").first().prop("checked", true);
     }
 
     this.$legend.append($container);
@@ -446,6 +525,7 @@ Legend.prototype.update = function () {
             case 0:
             case 1:
             case 2:
+            case 5:
                 _this.addViewSignatures(view);
                 break;
             case 3:
@@ -453,6 +533,8 @@ Legend.prototype.update = function () {
                 break;
         }
     });
+    
+    this.$legend.find("input:checked").change();
 };
 
 Legend.prototype.updateViews = function () {
@@ -463,12 +545,16 @@ Legend.prototype.updateViews = function () {
     $.each(views, function (i, view) {
         if (view.id === _this.selectedView ||
                 _this.views[0].concurrents.indexOf(view.id) >= 0 ||
-                [3, 4].indexOf(view.visibility) >= 0) {
+                [3, 4, 5].indexOf(view.visibility) >= 0) {
             updateStyles(view.id, view.type, view.signatures, j);
             if (view.id !== _this.selectedView)
                 _this.views.push(view);
             j++;
         }
+    });
+    
+    this.views.sort(function(a, b) {
+        return a.legendOrder - b.legendOrder;
     });
 };
 
@@ -478,7 +564,7 @@ Legend.prototype.updateViews = function () {
 
 var Statistic = function (options, values) {
     this.absolute = options.absolute;
-    this.filterView = options.filterView;
+    this.filterViews = options.filterViews;
     this.selection = options.selection;
     this.type = options.type;
     this.view = options.view;
@@ -488,15 +574,20 @@ var Statistic = function (options, values) {
 
     this.filteredValues = {};
     this.filterValue = null;
+    this.filterFeature = null;
 };
 
 Statistic.prototype.constructor = Statistic;
 
-Statistic.prototype.filter = function (key) {
-    var counts = {}, _this = this;
+Statistic.prototype.filter = function () {
+    var counts = {}, _this = this, key = null;
+
+    if (this.filterFeature !== null) {
+        key = this.filterFeature.properties[this.selection];
+    }
 
     $.each(_this.values, function (i, values) {
-        if (key !== null && values[0] !== key) {
+        if (key !== null && values[0] != key) {
             return true;
         }
 
@@ -506,10 +597,12 @@ Statistic.prototype.filter = function (key) {
 
         var signature = _this.getSignatureForValue(values[1]);
 
-        if (counts[signature.values[0]]) {
-            counts[signature.values[0]]++;
-        } else {
-            counts[signature.values[0]] = 1;
+        if (signature) {
+            if (counts[signature.values[0]]) {
+                counts[signature.values[0]]++;
+            } else {
+                counts[signature.values[0]] = 1;
+            }
         }
     });
 
@@ -517,7 +610,107 @@ Statistic.prototype.filter = function (key) {
 };
 
 Statistic.prototype.getSignatureForValue = function (value) {
-    return this.signatures.filter(function (sig) {
+    var signature = this.signatures.filter(function (sig) {
+        if (typeof sig.values[0] === "string") {
+            return sig.values.indexOf(value) > -1;
+        } else if (typeof sig.values[0] === "number") {
+            if (sig.values.length === 1) {
+                return sig.values[0] === Number(value);
+            } else {
+                return sig.values[0] <= Number(value) && Number(value) <= sig.values[1];
+            }
+        }
+    })[0];
+
+    return typeof signature === "undefined" ? false : signature;
+};
+
+/*
+ * Info-Class (ES5)
+ */
+
+var Info = function () {
+    var control = L.control({position: "bottomleft"});
+    control.onAdd = function () {
+        return L.DomUtil.create("div", "info");
+    };
+    control.addTo(map);
+
+    this.$info = $("div.info");
+    this.views = {};
+    this.layerViews = {};
+
+    this.updateViews();
+};
+
+Info.prototype.constructor = Info;
+
+Info.prototype.update = function () {
+    this.updateViews();
+    this.updateLayers();
+};
+
+Info.prototype.updateLayers = function () {
+    var _this = this;
+
+    $.each(this.layerViews, function (layerId, _views) {
+        leafletLayers[layerId].eachLayer(function (layer) {
+            var mouseover = function () {
+                _this.$info.append($("<strong>").text(layer.feature.properties[layers[layerId].infoAttribute]));
+
+                $.each(_views, function (viewId, view) {
+                    var signature = _this.getSignatureForValue(layer.feature.properties[view.attribute], views[viewId].signatures);
+                    if (signature) {
+                        _this.$info.append($("<p>").text(views[viewId].name + ": "
+                                + layer.feature.properties[view.attribute] + " // "
+                                + signature.label));
+                    }
+                });
+            };
+            
+            var mouseout = function () {
+                _this.$info.empty();
+            };
+            
+            layer.off("mouseover", mouseover);
+            layer.off("mouseout", mouseout);
+
+            layer.on("mouseover", mouseover);
+
+            layer.on("mouseout", mouseout);
+        });
+    });
+};
+
+Info.prototype.updateViews = function () {
+    this.views = {};
+    this.views[legend.selectedView] = views[legend.selectedView];
+    var _this = this;
+
+    $.each(views, function (i, view) {
+        if (_this.views[legend.selectedView].concurrents.indexOf(view.id) >= 0 ||
+                view.visibility === 3) {
+            _this.views[view.id] = view;
+        }
+    });
+
+    this.layerViews = {};
+
+    $.each(layer_views, function (i, layerView) {
+        $.each(_this.views, function (j, view) {
+            if (Object.keys(layerView).indexOf(view.id.toString()) >= 0) {
+                if (!_this.layerViews[i]) {
+                    _this.layerViews[i] = {};
+                }
+
+                _this.layerViews[i] = layerView;
+            }
+        });
+    });
+};
+
+Info.prototype.getSignatureForValue = function (value, signatures) {
+    return signatures.filter(function (sig) {
         if (typeof sig.values[0] === "string") {
             return sig.values.indexOf(value) > -1;
         } else if (typeof sig.values[0] === "number") {

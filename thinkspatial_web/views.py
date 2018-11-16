@@ -31,7 +31,7 @@ def index(request, template=None):
     basemaps = project.basemaps.all()
 
     # get the associated layers & predefined views
-    layers = Layer.objects.filter(project=project, enabled=True)
+    layers = Layer.objects.filter(project=project, enabled=True).order_by("id")
     views = {}
     for view in View_Layer.objects.filter(layer__in=layers, layer__project=project).order_by("order").values_list("view", flat=True):
         view = View.objects.get(pk=view)
@@ -45,7 +45,6 @@ def index(request, template=None):
         for view in _views:
             layer_views[layer.id][view["view"]] = {}
             layer_views[layer.id][view["view"]]["attribute"] = view["attribute__name"]
-            layer_views[layer.id][view["view"]]["order"] = view["order"]
         
     signatures = {}
     for id, view in views.items():
