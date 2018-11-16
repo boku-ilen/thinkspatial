@@ -151,6 +151,7 @@ def generate_layer_json(layer):
     logger.info("could not find a layer: {} - complete load time: {}ms".format(layer, time.time() - start))
     return False
 
+
 # returns a list of POIs as geoJSON
 def poigetgeojson(request, layer):
 
@@ -159,6 +160,7 @@ def poigetgeojson(request, layer):
 
     response = generate_layer_json(layer)
     return HttpResponse(json.dumps(response).replace('\\"', '\"'), content_type="application/geo+json")
+
 
 def symbolsvg(request, id, color, shadow=None):
 
@@ -207,6 +209,7 @@ def cluster(request):
 def getString(request, key):
     return HttpResponse(json.dumps({key: _(key)}), content_type="application/json")
 
+
 # returns json for given statistic id
 def get_statistics(request, layer):
     stats = Statistic.objects.all().filter(selection_attribute__layer_id=layer)
@@ -217,6 +220,7 @@ def get_statistics(request, layer):
         output.append(stat.get_json())
         
     return HttpResponse(json.dumps(output), content_type="application/json")
+
 
 def get_layer_data(request, layer):
     stats = Statistic.objects.all().filter(selection_attribute__layer_id=layer)
