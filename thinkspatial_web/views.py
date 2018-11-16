@@ -45,7 +45,6 @@ def index(request, template=None):
         for view in _views:
             layer_views[layer.id][view["view"]] = {}
             layer_views[layer.id][view["view"]]["attribute"] = view["attribute__name"]
-            layer_views[layer.id][view["view"]]["order"] = view["order"]
         
     signatures = {}
     for id, view in views.items():
