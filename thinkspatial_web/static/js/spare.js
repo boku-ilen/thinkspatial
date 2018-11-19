@@ -318,16 +318,16 @@ function updateStyles(view, type, signatures, i) {
                             l.setStyle(style);
                         } else if (signature.hover) {
                             var originalStyle = getStyle(l);
-                            
+
                             var mouseover = function () {
                                 l.setStyle(style);
                             };
-                            
+
                             var mouseout = function () {
                                 if (clickedLayer !== l)
                                     l.setStyle(originalStyle);
                             };
-                            
+
                             l.off("mouseover", mouseover);
                             l.off("mouseout", mouseout);
                             l.off("click");
@@ -443,7 +443,8 @@ Legend.prototype.addViewSignatures = function (view) {
 
     $.each(statistics, function (layer, statistics) {
         $.each(statistics, function (i, statistic) {
-            if (statistic.filterViews.indexOf(view.id) >= 0) {
+            if (_this.views.indexOf(views[statistic.view]) >= 0 &&
+                    statistic.filterViews.indexOf(view.id) >= 0) {
                 filterStatistics.push(statistic);
             }
         });
@@ -533,7 +534,7 @@ Legend.prototype.update = function () {
                 break;
         }
     });
-    
+
     this.$legend.find("input:checked").change();
 };
 
@@ -552,8 +553,8 @@ Legend.prototype.updateViews = function () {
             j++;
         }
     });
-    
-    this.views.sort(function(a, b) {
+
+    this.views.sort(function (a, b) {
         return a.legendOrder - b.legendOrder;
     });
 };
@@ -636,9 +637,14 @@ var Info = function () {
     };
     control.addTo(map);
 
+    var _this = this;
+
     this.$info = $("div.info");
     this.views = {};
     this.layerViews = {};
+    this.mouseout = function () {
+        _this.$info.empty();
+    };
 
     this.updateViews();
 };
@@ -655,6 +661,15 @@ Info.prototype.updateLayers = function () {
 
     $.each(this.layerViews, function (layerId, _views) {
         leafletLayers[layerId].eachLayer(function (layer) {
+
+            if (layer.listens("click") && layer._events.mouseover.length === 2) {
+                layer._events.mouseover.splice(-1, 1);
+            } else if (!layer.listens("click")) {
+                layer.off("mouseover");
+            }
+
+            layer.off("mouseout", _this.mouseout);
+
             var mouseover = function () {
                 _this.$info.append($("<strong>").text(layer.feature.properties[layers[layerId].infoAttribute]));
 
@@ -667,17 +682,9 @@ Info.prototype.updateLayers = function () {
                     }
                 });
             };
-            
-            var mouseout = function () {
-                _this.$info.empty();
-            };
-            
-            layer.off("mouseover", mouseover);
-            layer.off("mouseout", mouseout);
 
             layer.on("mouseover", mouseover);
-
-            layer.on("mouseout", mouseout);
+            layer.on("mouseout", _this.mouseout);
         });
     });
 };
