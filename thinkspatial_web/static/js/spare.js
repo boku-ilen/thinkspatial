@@ -643,7 +643,8 @@ var Info = function () {
     this.views = {};
     this.layerViews = {};
     this.mouseout = function () {
-        _this.$info.empty();
+        if (clickedLayer === null)
+            _this.$info.empty();
     };
 
     this.updateViews();
@@ -671,14 +672,19 @@ Info.prototype.updateLayers = function () {
             layer.off("mouseout", _this.mouseout);
 
             var mouseover = function () {
-                _this.$info.append($("<strong>").text(layer.feature.properties[layers[layerId].infoAttribute]));
+                if (clickedLayer !== null) {
+                    return true;
+                }
+                
+                if (layer.feature.properties[layers[layerId].infoAttribute])
+                    _this.$info.append($("<strong>").text(layer.feature.properties[layers[layerId].infoAttribute]));
 
                 $.each(_views, function (viewId, view) {
                     var signature = _this.getSignatureForValue(layer.feature.properties[view.attribute], views[viewId].signatures);
                     if (signature) {
                         _this.$info.append($("<p>").text(views[viewId].name + ": "
-                                + layer.feature.properties[view.attribute] + " // "
-                                + signature.label));
+                                + layer.feature.properties[view.attribute] + "; ")
+                                .append($("<span>").text(signature.label).css("color", signature.color)));
                     }
                 });
             };
