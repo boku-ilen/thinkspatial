@@ -98,7 +98,7 @@ urlpatterns = [
         views.symbolsvg, name="symbolsvg"),
 
     # get the poi geometries
-    url(r'^ajax/(?P<layer>[a-zA-Z0-9]+)/layer.geojson', views.poigetgeojson, name="poigetgeojson"),
+    url(r'^ajax/(?P<layer>[a-zA-Z0-9]+)/layer.geojson', views.generate_layer_json, name="generate_layer_json"),
     
     # get statistic json
     url(r'^ajax/(?P<layer>[0-9]+)/stats.json', views.get_statistics, name="get_statistic"),
@@ -113,6 +113,9 @@ urlpatterns = [
     
     # get the translation string based on a key
     url(r'^app/languages/(?P<key>[a-z_]+)', views.getString, name="getString"),
+    
+    # create questionnaire form
+    url(r'^survey/create/', views.create_survey, name="createSurvey"),
 
     # configuration for the REST-Framework (app-api)
     url(r"^rest/", include(router.urls)),

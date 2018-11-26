@@ -1,0 +1,31 @@
+{% extends "styles/plain/q_base.html" %}
+
+{% load i18n %}
+{% load l10n %}
+
+{% block content %}
+
+<script>
+    var qTypes = {{ question_types | safe }};
+    var project = {{ project }};
+</script>
+
+<template id="question">
+    <input type="text" required> <!-- Question -->
+    <input type="text"> <!-- Explanation -->
+</template>
+
+<main>
+    <h1>Create Survey</h1>
+    <section>
+        <h2>Add Question</h2>
+        <select id="qType">
+            {% for question_type in question_types %}
+            <option value="{{ question_type.0 }}">{{ question_type.1 }}</option>
+            {% endfor %}
+        </select>
+        <button type="button" id="addQuestion">+</button>
+    </section>
+    <button type="button" id="submitSurvey">Save</button>
+</main>
+{% endblock %}

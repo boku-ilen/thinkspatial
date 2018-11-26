@@ -1,0 +1,24 @@
+{% load static %}
+{% load i18n %}
+
+<!DOCTYPE html>
+<html lang="en">
+    
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="utf-8" />
+    {%  block title  %}<title>ThinkSpatial - {% trans "main page" %}</title>{% endblock %}
+    <link rel="shortcut icon" type="image/x-icon" href='{% static "/images/favicon.ico" %}' />
+    <!-- Add jQuery library -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js"></script>
+    
+    <link rel="stylesheet" type="text/css" href='{%  static "css/spareQ.css" %}?{% now "U" %}' />
+    <script type="text/javascript" src='{%  static "js/spareQ.js" %}?{% now "U" %}'></script>
+</head>
+
+<body>
+
+{% block content %}
+{% endblock %}
+
+</body>
+</html>

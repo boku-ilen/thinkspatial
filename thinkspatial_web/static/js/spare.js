@@ -85,11 +85,14 @@ function getLayers() {
                 leafletLayers[id] = initGeoJSON(data.geometry);
 
                 var _views = getViewsByLayerId(id), len = _views.length, j = 0;
+                
+                if (len === 0) {
+                    leafletLayers[id].addTo(map);
+                }
 
                 for (j; j < len; j++) {
                     if (_views[j].visibility !== 3) {
                         leafletLayers[id].addTo(map);
-                        //layerControl.addOverlay(leafletLayers[id], layer.name);
                         break;
                     }
                 }
@@ -206,12 +209,12 @@ function initGeoJSON(data) {
         pointToLayer: function (feature, latlng) {
             var iconSize = Math.round(feature.properties.size / 1);
             var smallIcon = L.icon({
-                iconUrl: root_url + "images_dyn/symbol_svg_ID.php?ID=" + feature.properties.symbol + "&C=" + feature.properties.color + "&shadow=0.5",
+                iconUrl: root_url + "images_dyn/" + feature.properties.symbol  + "/" + feature.properties.color + "/symbol_svg_id.svg?shadow=0.5",
                 iconSize: [iconSize, iconSize], // size of the icon
                 iconAnchor: [iconSize / 2, iconSize / 2], // point of the icon which will correspond to marker's location
                 popupAnchor: [0, -1 * (iconSize / 2)] // point from which the popup should open relative to the iconAnchor
             });
-            return new L.Marker(latlng, {icon: smallIcon, opacity: 0.85});
+            return L.marker(latlng, {icon: smallIcon, opacity: 0.85});
         }
     });
 

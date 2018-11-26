@@ -322,30 +322,26 @@ class Font(Base):
 
 # represents an renderable symbol
 class Symbol(Base):
-
-    #TODO: scale? hier oder im konkreten anwendungfall?
-    scale = models.PositiveIntegerField(default=1)
-
     # the name of the symbol
     name = models.TextField(default=None)
 
     # the svg code representation of the symbol
-    code = models.TextField(default=None)
+    code = models.TextField(null=True)
 
     # used character (optional)
-    character = models.CharField(default=None, max_length=1)
+    character = models.CharField(max_length=1, null=True)
 
     # link to the used font (optional)
-    font = models.ForeignKey(Font, on_delete=models.PROTECT, related_name='+')
+    font = models.ForeignKey(Font, on_delete=models.PROTECT, related_name='+', null=True)
 
     # the license of the symbol (optional)
-    license = models.TextField(default=None)
+    license = models.TextField(null=True)
 
     # the creator of the symbol (optional)
-    author = models.TextField(default=None)
+    author = models.TextField(null=True)
 
     # the alternative complex symbol as a file (svg) (optional)
-    file = models.FilePathField(default=None)
+    file = models.FilePathField(null=True)
 
 
 # ..
@@ -517,3 +513,48 @@ class Statistic(Base):
         output["values"] = list(zip(group_by_values, attribute_values, filter_values))
         
         return output
+
+class Question(Base):
+    QUESTION_TYPE = (
+        (1, "text"),
+        (2, "textfield"),
+        (3, "date"),
+        
+        (11, "radio"),
+        (12, "radio-color"), #implemented
+        (13, "radio-symbol"), #implemented
+        (14, "radio-symbol-size"), #implemented
+        
+        (21, "checkbox"),
+        (31, "select"),
+        (41, "matrix")
+    )
+    
+    type = models.PositiveIntegerField(choices=QUESTION_TYPE)
+    
+    question = models.TextField()
+    
+    explanation = models.TextField(null=True)
+    
+    attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT)
+    
+    order = models.PositiveIntegerField(default=0)
+    
+class QuestionValue(Base):
+    question = models.ForeignKey(Question, on_delete=models.PROTECT)
+    
+    #left for matrix, only label for all other types
+    label_left = models.TextField(null=True)
+    
+    label_right = models.TextField(null=True)
+    
+    symbol = models.ForeignKey(Symbol, on_delete=models.PROTECT, null=True)
+    
+    order = models.PositiveIntegerField(default=0)
+    
+class QuestionMatrixColumn(Base):
+    question = models.ForeignKey(Question, on_delete=models.PROTECT)
+    
+    label = models.TextField()
+    
+    order = models.PositiveIntegerField(default=0)

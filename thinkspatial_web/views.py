@@ -19,13 +19,15 @@ logger = logging.getLogger(__name__)
 def index(request, template=None):
 
     # get the default project if there is no project defined in the session yet
-    project = request.session.get("project")
+    project = Project.objects.get(pk=request.session.get("project"))
     if project is None:
         # if there is a django settings variable pointing to a valid project use it if not take the first available
         if settings.DEFAULT_PROJECT:
             project = Project.objects.get(pk=settings.DEFAULT_PROJECT)
         if project is None:
             project = Project.objects.first()
+            
+        request.session["project"] = project.id
 
     # get the associated basemaps
     basemaps = project.basemaps.all()
@@ -117,41 +119,67 @@ def imgcolor(request):
     img.save(response, "PNG")
     return response
 
-
-# returns the geojson data including used attribue values for a given layer
 def generate_layer_json(layer):
     start = time.time()
     lyr = Layer.objects.get(pk=layer)
+    
+    if lyr is not None:
+        if lyr.geometry_type == 1:
+            return generate_point_layer_json(lyr)
+        else:
+            return generate_2d_layer_json(lyr)
+    else:
+        # no layer data could be found so return an empty answer
+        logger.info("could not find a layer: {} - complete load time: {}ms".format(layer, time.time() - start))
+        return False
+
+# returns the geojson data including used attribue values for a given layer
+def generate_2d_layer_json(lyr):
+    start = time.time()
 
     response = {"type": "FeatureCollection", "features": []}
-    if lyr is not None:
 
-        # TODO: add crs?
+    # TODO: add crs?
 
-        logger.debug("startup time: {}ms".format(time.time() - start))
-        geometries = Geometry.objects.filter(layer=lyr).order_by("id")  #, geom__within=boundingbox
-        logger.debug("geometries load time: {}ms (suspected to be lazy loaded)".format(time.time() - start))
-        attributes = get_attributes(lyr.id)
-        views = attributes[1]
-        attributes = attributes[0]
+    logger.debug("startup time: {}ms".format(time.time() - start))
+    geometries = Geometry.objects.filter(layer=lyr).order_by("id")#[0:500]  #, geom__within=boundingbox
+    logger.debug("geometries load time: {}ms (suspected to be lazy loaded)".format(time.time() - start))
+    attributes = get_attributes(lyr.id)
+    views = attributes[1]
+    attributes = attributes[0]
 
-        # get geometry and properties from all attributes which are referenced in prepared views
-        for index, geometry in enumerate(geometries):
-            feature = {"geometry": json.loads(geometry.geom.json),
-                "properties": {attribute[0]: attribute[1] for attribute in
-                    attributes[index * views:index * views + views]}, "type": "Feature"}
-            response["features"].append(feature)
-            
-            logger.debug("complete load time: {}ms".format(time.time() - start))
-            
-        return response
+    # get geometry and properties from all attributes which are referenced in prepared views
+    for index, geometry in enumerate(geometries):
+        feature = {"geometry": json.loads(geometry.geom.json),
+            "properties": {attribute[0]: attribute[1] for attribute in
+                attributes[index * views:index * views + views]}, "type": "Feature"}
+        response["features"].append(feature)
 
-    # no layer data could be found so return an empty answer
-    logger.info("could not find a layer: {} - complete load time: {}ms".format(layer, time.time() - start))
-    return False
+        logger.debug("complete load time: {}ms".format(time.time() - start))
 
+    return response
 
 # returns a list of POIs as geoJSON
+
+def generate_point_layer_json(lyr):
+    start = time.time()
+    
+    response = {"type": "FeatureCollection", "features": []}
+    
+    geometries = Geometry.objects.filter(layer=lyr).order_by("id")
+    attributes = AttributeValue.objects.filter(attribute__layer=lyr).order_by("id")
+    attributesCount = Attribute.objects.filter(layer=lyr).count()
+    
+    for index, geometry in enumerate(geometries):
+        feature = {"geometry": json.loads(geometry.geom.json),
+            "properties": {attribute.attribute.name.replace("symbol-", ""): attribute.value for attribute in
+                attributes[index * attributesCount:index * attributesCount + attributesCount]}, "type": "Feature"}
+        response["features"].append(feature)
+
+        logger.debug("complete load time: {}ms".format(time.time() - start))
+
+    return response
+
 def poigetgeojson(request, layer):
 
     # check for a valid session and the current project
@@ -234,3 +262,14 @@ def get_layer_data(request, layer):
     output["geometry"] = generate_layer_json(layer)
     
     return HttpResponse(json.dumps(output), content_type="application/json")
+
+
+def create_survey(request):
+    project = request.session.get("project")
+    
+    context = {
+        "project": project,
+        "question_types": [list(i) for i in Question.QUESTION_TYPE]
+    }
+    
+    return render(request, "q_form.html", context)
