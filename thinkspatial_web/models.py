@@ -532,7 +532,7 @@ class Statistic(Base):
         return output
 
 
-# FIXME: overwriting already defined class Question from above! (delete it or rename it)
+# FIXME: add comment for the model structure
 class Question(Base):
     QUESTION_TYPE = (
         (1, "text"),
