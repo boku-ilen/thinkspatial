@@ -514,6 +514,8 @@ class Statistic(Base):
         
         return output
 
+
+# FIXME: overwriting already defined class Question from above! (delete it or rename it)
 class Question(Base):
     QUESTION_TYPE = (
         (1, "text"),
@@ -532,7 +534,7 @@ class Question(Base):
     
     type = models.PositiveIntegerField(choices=QUESTION_TYPE)
     
-    question = models.TextField()
+    question = models.TextField()  # FIXME: refactor name to "question_text" or something meaningful
     
     explanation = models.TextField(null=True)
     
