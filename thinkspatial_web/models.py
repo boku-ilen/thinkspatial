@@ -128,7 +128,8 @@ class Layer(Base):
 
     @property
     def has_statistics(self):
-        return len(Statistic.objects.all().filter(selection_attribute__layer_id=self.id)) > 0
+        return len(Statistic.objects.all().filter(selection_attribute__layer_id=self.id) 
+    | Statistic.objects.all().filter(selection_attribute=None, view__view_layer__layer=self)) > 0
 
 
 # represents a single geometry on a map
@@ -238,7 +239,8 @@ class View(Base):
         (12, "FILL_STROKE_WEIGHT"),
         (13, "FILL_STROKE_DASH"),
         (14, "FILL_WEIGHT_DASH"),
-        (15, "ALL")
+        (15, "ALL"),
+        (16, "POINTS")
     )
     
     VISIBILITY_CHOICES = (
@@ -273,11 +275,8 @@ class View(Base):
     legend_order = models.PositiveIntegerField(default=0)
     
     def concurrents_as_json(self):
-        js = json.dumps(list(self.concurrent_views.all().values_list("id")))
-        if len(js) > 2:
-            return js[1:-1]
-        else:
-            return js
+        js = list(self.concurrent_views.all().values_list("id", flat=True))
+        return js
 
 class View_Layer(Base):
     view = models.ForeignKey(View, on_delete=models.PROTECT)
@@ -388,6 +387,21 @@ class Signature(Base):
     
     hover = models.BooleanField(default=False)
     
+    @property
+    def key(self):
+        for layer in self.view.view_layer_set.all():
+            name = layer.attribute.name
+            break
+            
+        if name == "symbol":
+            return "<div class='key symbol' style='background-image: url(/images_dyn/" + self.min_value + "/ffffff/symbol_svg_id.svg?shadow=0.5)'></div>"
+        elif name == "symbol-color":
+            return "<div class='key color'><div style='background-color: #" + self.min_value + "'></div></div>"
+        elif name == "symbol-size":
+            return "<div class='key size'><div></div></div>"
+        else:
+            return self.to_svg()
+    
     def to_svg(self):
         svg = "<svg width='32px' height='32px' viewBox='0 0 24 12'><line x1='0' x2='32' y1='6' y2='6' style='"
         
@@ -443,18 +457,6 @@ class Participant(Base):
     # age of the participant
     age = models.PositiveIntegerField()
 
-
-# representation of a single question in a form
-class Question(Base):
-
-    QUESTION_TYPE_CHOICES = (
-        ('ST', 'SHORT_TEXT'),
-        ('LT', 'LONG_TEXT'),
-        ('SC', 'SINGLE_CHOICE'),
-    )
-    question_type = models.PositiveIntegerField(choices=QUESTION_TYPE_CHOICES)
-
-
 # represents a category
 class Category(Base):
 
@@ -476,7 +478,9 @@ class Category(Base):
 #
 class Statistic(Base):
     DIAGRAM_TYPE = (
-        (1, "Bar Chart"), # Balkendiagramm
+        (0, "Invisible"),
+        (1, "Bar Chart"),
+        (2, "Inline") # inline w/ legend key
     )
     
     # diagram type
@@ -489,11 +493,13 @@ class Statistic(Base):
     attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="attribute")
 
     # group by an attribute
-    group_by_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="group_by")
+    group_by_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="group_by", default=None, null=True)
     
     # attribute of (another) layer to select group_by areas –
     # must have the same values as group_by_attribute
-    selection_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="selection")
+    selection_attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT, related_name="selection", default=None, null=True)
+    
+    selection_view = models.ForeignKey(View, on_delete=models.PROTECT, related_name="selection_view", default=None, null=True)
     
     # view
     view = models.ForeignKey(View, on_delete=models.PROTECT)
@@ -502,15 +508,26 @@ class Statistic(Base):
     filter_views = models.ManyToManyField(View, related_name="filter_view")
     
     def get_json(self):
-        attribute_values = AttributeValue.objects.filter(attribute=self.attribute.id).order_by("id").values_list(self.attribute.type_to_column(), flat=True)
-        group_by_values = AttributeValue.objects.filter(attribute=self.group_by_attribute.id).order_by("id").values_list(self.group_by_attribute.type_to_column(), flat=True)
+        attribute_values = AttributeValue.objects.filter(attribute=self.attribute.id).order_by("id").values_list(self.attribute.type_to_column(), flat=True)[0:500]
+        
+        if self.group_by_attribute is not None:
+            group_by_values = AttributeValue.objects.filter(attribute=self.group_by_attribute.id).order_by("id").values_list(self.group_by_attribute.type_to_column(), flat=True)[0:500]
+        else:
+            group_by_values = [0 for i in range(0,len(attribute_values))]
         
         if self.filter_views is not None:
-            filter_attribute = Attribute.objects.filter(id__in=View_Layer.objects.filter(view__in=self.filter_views.all()).values_list("attribute", flat=True))[0]
-            filter_values = AttributeValue.objects.filter(attribute=filter_attribute).order_by("id").values_list(filter_attribute.type_to_column(), flat=True)
+            filter_attributes = Attribute.objects.filter(id__in=View_Layer.objects.filter(view__in=self.filter_views.all()).values_list("attribute", flat=True))
+            filter_values = []
+            for filter_attribute in filter_attributes:
+                filter_values.append(AttributeValue.objects.filter(attribute=filter_attribute).order_by("id").values_list(filter_attribute.type_to_column(), flat=True)[0:500])
         
-        output = {"options": {"type": self.type, "absolute": self.absolute, "selection": self.selection_attribute.name, "view": self.view.id, "filterViews": list(self.filter_views.all().values_list("id", flat=True))}}
-        output["values"] = list(zip(group_by_values, attribute_values, filter_values))
+        output = {"options": {"type": self.type, "absolute": self.absolute, "view": self.view.id, "filterViews": list(self.filter_views.all().values_list("id", flat=True))}}
+        
+        if self.selection_attribute is not None:
+            output["options"]["selection"] = self.selection_attribute.name
+            output["options"]["selectionView"] = self.selection_view.id
+        
+        output["values"] = list(zip(group_by_values, attribute_values, *filter_values))
         
         return output
 

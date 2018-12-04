@@ -142,7 +142,7 @@ def generate_2d_layer_json(lyr):
     # TODO: add crs?
 
     logger.debug("startup time: {}ms".format(time.time() - start))
-    geometries = Geometry.objects.filter(layer=lyr).order_by("id")#[0:500]  #, geom__within=boundingbox
+    geometries = Geometry.objects.filter(layer=lyr).order_by("id")[0:500]  #, geom__within=boundingbox
     logger.debug("geometries load time: {}ms (suspected to be lazy loaded)".format(time.time() - start))
     attributes = get_attributes(lyr.id)
     views = attributes[1]
@@ -174,6 +174,8 @@ def generate_point_layer_json(lyr):
         feature = {"geometry": json.loads(geometry.geom.json),
             "properties": {attribute.attribute.name.replace("symbol-", ""): attribute.value for attribute in
                 attributes[index * attributesCount:index * attributesCount + attributesCount]}, "type": "Feature"}
+        
+        feature["geometry"]["coordinates"] = list(reversed(feature["geometry"]["coordinates"]))
         response["features"].append(feature)
 
         logger.debug("complete load time: {}ms".format(time.time() - start))
@@ -250,7 +252,9 @@ def get_statistics(request, layer):
 
 
 def get_layer_data(request, layer):
-    stats = Statistic.objects.all().filter(selection_attribute__layer_id=layer)
+    stats1 = Statistic.objects.all().filter(selection_attribute__layer_id=layer)
+    stats2 = Statistic.objects.all().filter(selection_attribute=None, view__view_layer__layer=layer)
+    stats = stats1 | stats2
     output = {}
     
     for i, stat in enumerate(stats):

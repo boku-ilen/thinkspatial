@@ -1,0 +1,703 @@
+[
+    {
+        "fields": {
+            "basemaps": [
+                1
+            ],
+            "bounding_wkt": "0103000020E610000001000000050000007575C7629B2C4840938FDD054A1E304079AD84EE920E4840938FDD054A1E304079AD84EE920E4840EB39E97DE39730407575C7629B2C4840EB39E97DE39730407575C7629B2C4840938FDD054A1E3040",
+            "center_wkt": "POINT(47.00852839835919 11.912527084350586)",
+            "color": "63D7CF",
+            "create_timestamp": "2010-01-01T00:00:00Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "desc": "Willkommen bei Think Spatial! einer interaktiven Lern und Beteiligungsplattform zur Erfassung, Darstellung und Analyse r\u00e4umlicher Punktdaten. ",
+            "disclaimer": "<strong>Pan-Alpine overview</strong>\r\n<p><strong><em>Please, be patient as the initial loading of the data may take a while. In the meantime, we invite you to read the following disclaimer:</em></strong></p>\r\n<p>The pan\u2013Alpine overview of the river network is based on official data provided by national/regional administration. Most of the data are part of national river basin management plans reported in the frame of the WFD. Since the WFD defines the obligations to maintain the good respectively high ecological status of rivers, this clear and fundamental mission for protection is specifically addressed by highlighting the \u201cecological status\u201d and the \u201cprotection priority\u201d within the Alpine Arc. Ecological status (EU countries) and ecological value (a surrogate parameter for Switzerland based on Muhar et al. 2013) were assembled from national data. A very high protection priority is assigned to river units with a high ecological status/value, river units with an associated IUCN Cat. Ia, Ib, or II area, river units with a high hydromorphological status (i.e. high morphological status and absence of hydrological pressures), and/or natural river units (\u2260 AWB/HWMB) associated with Cat. A floodplains/wetlands. Data are shown for river units (= river stretch between two tributaries) for rivers with a catchment \u226510 km\u00b2. Queries are possible for selected administrative areas, catchments as well as for SPARE Pilot Case Studies (PCS).</p>\r\n<p>It should be noted, that some regions of the Alpine Arc show a high amount of rivers designated with \u201chigh or good ecological status or very high protection priority\u201d. This can be explained e.g. by the application of different monitoring approaches. Additionally, for some regions big data gaps were identified by spatial analyses within SPARE. Thus, the \u2018overall picture\u2019 has to be viewed in the light of these partly biased results. More detailed information including the evaluation process can be found in the \u201cReport on the status of Alpine river ecosystems\u201d.</p>\r\n\r\n<strong>Data sources:</strong>\r\n<ul>\r\n<li>Perimeter of the Alpine Convention: Permanent Secretariat of the Alpine Convention (2017); </li>\r\n<li>National river networks: BMLFUW (2015), LfU (2015), Eaufrance (2013), ADBPO (2016), ADBVE (2016), Regione Liguria (2013), GURS (2004), OSM Switzerland (year?), CCM2.1 (2008); </li>\r\n<li>Administrative boundaries: GADM database (2015); </li>\r\n<li>Lakes & Catchments: EEA (2012); </li>\r\n<li>Large rivers: CCM River and Catchment Database (EC - JRC 2007); </li>\r\n<li>Protection priority data: ADBPO (2016), ADBVE (2016), APB (2005, 2009, 2014), ARSO (s.a.,2013, 2015, 2016), BAFU (2006, 2007, 2008, 2009, 2010, 2011, 2012, 2015, 2016), Energieatlas Bayern (2016), BMLFUW (2015), BOKU IHG (2018), Cantons of Switzerland (s.a.), CARMEN (2011), CSCF (2017), Eaufrance (2013), EAWAG (2011), ICPDR (2015), IRSTEA (2013), LfU (2004, 2009, 2013, 2015), Regione Liguria (2013), UBA (2011), EEA (2015, 2016), WWF Switzerland (s.a.); </li>\r\n<li>Ecological status (EU)/ ecological value (CH): BMLFUW (2015), LfU (2015), Eaufrance (2013), ADBPO (2016), ADBVE (2016), Regione Liguria (2013), ARSO (2016), BAFU (2006, 2009, 2011), EAWAG (2011), WWF Switzerland (s.a.), CSCF (2017), Cantons of Switzerland (s.a.), BOKU IHG (2018);</li>\r\n",
+            "homepage": "http://iamhere.boku.ac.at/transpace/",
+            "icon": "favicon.ico",
+            "info": "Info",
+            "location": "Wien",
+            "name": "spare",
+            "template": 1,
+            "texture": "a",
+            "update_timestamp": null,
+            "update_user": null,
+            "zoom_default": 6,
+            "zoom_max": 21,
+            "zoom_min": 6
+        },
+        "model": "thinkspatial_web.project",
+        "pk": 13
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-26T09:19:47.414Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "geometry_type": 1,
+            "info_attribute": null,
+            "name": "Test points",
+            "project": 13,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.layer",
+        "pk": 26
+    },
+    {
+        "fields": {
+            "date_joined": "2018-08-22T10:43:46.152Z",
+            "email": "z@z.za",
+            "first_name": "",
+            "groups": [],
+            "is_active": true,
+            "is_staff": true,
+            "is_superuser": true,
+            "last_login": "2018-08-22T10:48:20.400Z",
+            "last_name": "",
+            "password": "pbkdf2_sha256$120000$umuairaMGvhA$i7rP61YoCxgOQm4HgcealSsqf4w+60yOKHMQkkyAsCs=",
+            "user_permissions": [],
+            "username": "z"
+        },
+        "model": "auth.user",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-26T09:25:06.308Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "geom": "SRID=4326;POINT (47.00852839835919 11.91252708435059)",
+            "layer": 26,
+            "update_timestamp": null,
+            "update_user": null,
+            "wkt": "POINT(47.00852839835919 11.912527084350586)"
+        },
+        "model": "thinkspatial_web.geometry",
+        "pk": 65686
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-26T09:22:03.088Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 26,
+            "name": "symbol-size",
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 657
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-26T09:22:03.088Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 26,
+            "name": "symbol-color",
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 656
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-26T09:22:03.088Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 26,
+            "name": "symbol",
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 655
+    },
+    {
+        "fields": {
+            "attribute": 657,
+            "create_timestamp": "2018-11-27T09:09:35.008Z",
+            "create_user": 1,
+            "date_value": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "float_value": null,
+            "integer_value": 16,
+            "string_value": "",
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attributevalue",
+        "pk": 18394599
+    },
+    {
+        "fields": {
+            "attribute": 656,
+            "create_timestamp": "2018-11-27T09:09:34.246Z",
+            "create_user": 1,
+            "date_value": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "float_value": null,
+            "integer_value": null,
+            "string_value": "00ff00",
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attributevalue",
+        "pk": 18394598
+    },
+    {
+        "fields": {
+            "attribute": 655,
+            "create_timestamp": "2018-11-27T09:09:33.037Z",
+            "create_user": 1,
+            "date_value": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "float_value": null,
+            "integer_value": 2,
+            "string_value": null,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attributevalue",
+        "pk": 18394597
+    },
+    {
+        "fields": {
+            "attribute": 657,
+            "create_timestamp": "2018-11-26T09:31:20.482Z",
+            "create_user": 1,
+            "date_value": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "float_value": null,
+            "integer_value": 32,
+            "string_value": "",
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attributevalue",
+        "pk": 18394596
+    },
+    {
+        "fields": {
+            "attribute": 656,
+            "create_timestamp": "2018-11-26T09:31:20.482Z",
+            "create_user": 1,
+            "date_value": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "float_value": null,
+            "integer_value": null,
+            "string_value": "ff0000",
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attributevalue",
+        "pk": 18394595
+    },
+    {
+        "fields": {
+            "attribute": 655,
+            "create_timestamp": "2018-11-26T09:31:20.482Z",
+            "create_user": 1,
+            "date_value": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "float_value": null,
+            "integer_value": 1,
+            "string_value": null,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attributevalue",
+        "pk": 18394594
+    },
+    {
+        "fields": {
+            "concurrent_views": [
+                7,
+                8
+            ],
+            "create_timestamp": "2018-11-26T09:26:02.175Z",
+            "create_user": 1,
+            "default": true,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "legend_order": 12,
+            "legend_tab_order": 0,
+            "name": "Symbol Sizes",
+            "signature_type": 16,
+            "update_timestamp": null,
+            "update_user": null,
+            "visibility": 5
+        },
+        "model": "thinkspatial_web.view",
+        "pk": 9
+    },
+    {
+        "fields": {
+            "concurrent_views": [
+                7,
+                9
+            ],
+            "create_timestamp": "2018-11-26T09:26:02.175Z",
+            "create_user": 1,
+            "default": true,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "legend_order": 11,
+            "legend_tab_order": 0,
+            "name": "Symbol Colors",
+            "signature_type": 16,
+            "update_timestamp": null,
+            "update_user": null,
+            "visibility": 5
+        },
+        "model": "thinkspatial_web.view",
+        "pk": 8
+    },
+    {
+        "fields": {
+            "concurrent_views": [
+                8,
+                9
+            ],
+            "create_timestamp": "2018-11-26T09:26:02.175Z",
+            "create_user": 1,
+            "default": true,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "legend_order": 10,
+            "legend_tab_order": 0,
+            "name": "Symbols",
+            "signature_type": 16,
+            "update_timestamp": null,
+            "update_user": null,
+            "visibility": 5
+        },
+        "model": "thinkspatial_web.view",
+        "pk": 7
+    },
+    {
+        "fields": {
+            "absolute": true,
+            "attribute": 657,
+            "create_timestamp": "2018-11-27T09:18:33.977Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "filter_views": [
+                7,
+                8
+            ],
+            "group_by_attribute": null,
+            "selection_attribute": null,
+            "selection_view": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 9
+        },
+        "model": "thinkspatial_web.statistic",
+        "pk": 18
+    },
+    {
+        "fields": {
+            "absolute": true,
+            "attribute": 656,
+            "create_timestamp": "2018-11-27T09:18:33.977Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "filter_views": [
+                7,
+                9
+            ],
+            "group_by_attribute": null,
+            "selection_attribute": null,
+            "selection_view": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 8
+        },
+        "model": "thinkspatial_web.statistic",
+        "pk": 17
+    },
+    {
+        "fields": {
+            "absolute": true,
+            "attribute": 655,
+            "create_timestamp": "2018-11-27T09:18:33.977Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "filter_views": [
+                8,
+                9
+            ],
+            "group_by_attribute": null,
+            "selection_attribute": null,
+            "selection_view": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 7
+        },
+        "model": "thinkspatial_web.statistic",
+        "pk": 16
+    },
+    {
+        "fields": {
+            "author": null,
+            "character": null,
+            "code": "M50,2.135c8.545,0 19.07,26.088 19.07,26.088c0,0 28.026,1.836 30.703,10.075c2.641,8.127 -18.918,26.197 -18.918,26.197c0,0 6.915,27.222 -0.093,32.314c-6.914,5.023 -30.762,-9.896 -30.762,-9.896c0,0 -23.753,14.988 -30.761,9.896c-6.914,-5.023 -0.094,-32.314 -0.094,-32.314c0,0 -21.595,-17.959 -18.918,-26.197c2.641,-8.128 30.704,-10.075 30.704,-10.075c0,0 10.406,-26.088 19.069,-26.088Z\n",
+            "create_timestamp": "2018-11-26T09:50:51.361Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "file": null,
+            "font": null,
+            "license": null,
+            "name": "Star",
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.symbol",
+        "pk": 1
+    },
+    {
+        "fields": {
+            "author": null,
+            "character": null,
+            "code": "M100,40c0,-22.077 -22.404,-40 -50,-40c-27.596,0 -50,17.923 -50,40c0,13.046 7.953,25.273 21.309,32.759l-6.309,27.241l22.045,-21.366c4.225,0.907 8.581,1.366 12.955,1.366c27.596,0 50,-17.923 50,-40Z",
+            "create_timestamp": "2018-11-27T08:53:35.968Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "file": null,
+            "font": null,
+            "license": null,
+            "name": "Text Bubble",
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.symbol",
+        "pk": 4
+    },
+    {
+        "fields": {
+            "author": null,
+            "character": null,
+            "code": "M50,0l47.553,34.549l-18.164,55.902l-58.778,0l-18.164,-55.902l47.553,-34.549Z",
+            "create_timestamp": "2018-11-27T08:53:35.968Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "file": null,
+            "font": null,
+            "license": null,
+            "name": "Pentagon",
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.symbol",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "author": null,
+            "character": null,
+            "code": "M50,20c10.526,-20 31.579,-20 42.105,-10c10.527,10 10.527,30 0,50c-7.368,15 -26.316,30 -42.105,40c-15.79,-10 -34.737,-25 -42.105,-40c-10.527,-20 -10.527,-40 0,-50c10.526,-10 31.579,-10 42.105,10Z",
+            "create_timestamp": "2018-11-27T08:53:35.968Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "file": null,
+            "font": null,
+            "license": null,
+            "name": "Heart",
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.symbol",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Large",
+            "max_value": null,
+            "min_value": "48",
+            "order": 3,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 9
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 26
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Medium",
+            "max_value": null,
+            "min_value": "32",
+            "order": 2,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 9
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 25
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Small",
+            "max_value": null,
+            "min_value": "16",
+            "order": 1,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 9
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 24
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Blue",
+            "max_value": null,
+            "min_value": "0000ff",
+            "order": 3,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 8
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 23
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Green",
+            "max_value": null,
+            "min_value": "00ff00",
+            "order": 2,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 8
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 22
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Red",
+            "max_value": null,
+            "min_value": "ff0000",
+            "order": 1,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 8
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 21
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Text Bubble",
+            "max_value": null,
+            "min_value": "4",
+            "order": 4,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 7
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 20
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Pentagon",
+            "max_value": null,
+            "min_value": "3",
+            "order": 3,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 7
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 19
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Heart",
+            "max_value": null,
+            "min_value": "2",
+            "order": 2,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 7
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 18
+    },
+    {
+        "fields": {
+            "array": false,
+            "create_timestamp": "2018-11-27T08:56:11.864Z",
+            "create_user": 1,
+            "dash_array": null,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "fill_color": null,
+            "fill_opacity": null,
+            "hover": false,
+            "label": "Star",
+            "max_value": null,
+            "min_value": "1",
+            "order": 1,
+            "stroke": null,
+            "stroke_color": null,
+            "stroke_opacity": null,
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 7
+        },
+        "model": "thinkspatial_web.signature",
+        "pk": 17
+    }
+]

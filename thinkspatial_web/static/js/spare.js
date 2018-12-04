@@ -85,7 +85,7 @@ function getLayers() {
                 leafletLayers[id] = initGeoJSON(data.geometry);
 
                 var _views = getViewsByLayerId(id), len = _views.length, j = 0;
-                
+
                 if (len === 0) {
                     leafletLayers[id].addTo(map);
                 }
@@ -154,6 +154,18 @@ function getViewsByLayerId(layer) {
     return layerViews;
 }
 
+function getLayersByViewId(view) {
+    var layers = [];
+
+    $.each(layer_views, function (layer, views) {
+        if (Object.keys(views).indexOf(view.toString()) >= 0) {
+            layers.push(parseInt(layer));
+        }
+    });
+
+    return layers;
+}
+
 function initLeaflet() {
     map = L.map('map', {
         center: map_center,
@@ -209,7 +221,7 @@ function initGeoJSON(data) {
         pointToLayer: function (feature, latlng) {
             var iconSize = Math.round(feature.properties.size / 1);
             var smallIcon = L.icon({
-                iconUrl: root_url + "images_dyn/" + feature.properties.symbol  + "/" + feature.properties.color + "/symbol_svg_id.svg?shadow=0.5",
+                iconUrl: root_url + "images_dyn/" + feature.properties.symbol + "/" + feature.properties.color + "/symbol_svg_id.svg?shadow=0.5",
                 iconSize: [iconSize, iconSize], // size of the icon
                 iconAnchor: [iconSize / 2, iconSize / 2], // point of the icon which will correspond to marker's location
                 popupAnchor: [0, -1 * (iconSize / 2)] // point from which the popup should open relative to the iconAnchor
@@ -248,24 +260,43 @@ function resetStroke() {
 function updateStatistics(layerId, layer) {
     var stats = statistics[layers[layerId].name];
 
-    if (stats.length > 0) {
-        StackedBarChart.removeCharts();
-    }
-
     $.each(stats, function (i, statistic) {
-        if (statistic.view === legend.selectedView ||
-                views[legend.selectedView].concurrents.indexOf(statistic.view) >= 0) {
-            if (layer !== null && layer !== false) {
-                statistic.filterFeature = layer.feature;
-            } else if (layer === false) {
-                statistic.filterFeature = null;
+        if (i === 0) {
+            if (statistic.type === 1) {
+                StackedBarChart.removeCharts();
             }
-            StackedBarChart.create(statistic);
+        }
+
+        if (statistic.view === legend.selectedView ||
+                views[legend.selectedView].concurrents.indexOf(statistic.view) >= 0 ||
+                views[statistic.view].visibility === 5) {
+
+            if (statistic.type === 1) {
+                if (layer !== null && layer !== false) {
+                    statistic.filterFeature = layer.feature;
+                } else if (layer === false) {
+                    statistic.filterFeature = null;
+                }
+                StackedBarChart.create(statistic);
+            } else if (statistic.type === 2) {
+                statistic.filter();
+                
+                $("div[data-view=" + statistic.view + "] div.key").each(function() {
+                    if (Object.keys(statistic.filteredValues).indexOf($(this).data("value").toString()) >= 0) {
+                        $(this).attr("data-count", statistic.filteredValues[$(this).data("value")]);
+                    } else {
+                        $(this).attr("data-count", 0);
+                    }
+                });
+            }
         }
     });
 }
 
 function updateStyles(view, type, signatures, i) {
+    if (views[view].type === 16)
+        return;
+
     $.each(layer_views, function (layerId, layer_view) {
         if (typeof layer_view[view] !== "undefined") {
             var layer = leafletLayers[layerId];
@@ -389,7 +420,10 @@ function updateVisibleLayers() {
 var Legend = function () {
     var control = L.control({position: "bottomright"});
     control.onAdd = function () {
-        return L.DomUtil.create("div", "legend");
+        var div = L.DomUtil.create("div", "legend");
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+        return div;
     };
     control.addTo(map);
 
@@ -455,36 +489,71 @@ Legend.prototype.addViewSignatures = function (view) {
 
     $.each(view.signatures, function (i, signature) {
         var $signature = $("<div>").addClass("signature");
-        $signature.append(signature.svg);
+        $signature.append(signature.key);
+        
+        $signature.children().attr("data-value", signature.values[0]);
 
         var span = $("<span>").text(signature.label);
 
         if (filterStatistics.length > 0) {
             span.css("cursor", "pointer");
-        }
 
-        $.each(filterStatistics, function (i, statistic) {
             span.on("click", function () {
                 var $this = $(this);
 
                 if ($this.hasClass("active")) {
                     $this.removeClass("active");
-                    statistic.filterValue = null;
                 } else {
-                    $("div.legend div.signatures span.active").click();
+                    var views = view.concurrents.concat([view.id]);
+                    $.each(views, function (i, viewId) {
+                        $("[data-view=" + viewId + "] span.active").click();
+                    });
                     $this.addClass("active");
-                    statistic.filterValue = signature.values[0];
                 }
-
-                updateStatistics(_this.$legend.find("input:checked").val(), null);
             });
-        });
+
+            $.each(filterStatistics, function (i, statistic) {
+                span.on("click", function () {
+                    if (statistic.filterViews[statistic.filterViewIndex] === view.id && statistic.filterValue === signature.values[0]) {
+                        statistic.unsetFilterValue();
+                    } else {
+                        statistic.setFilterValue(signature.values[0], view.id);
+                    }
+
+                    if (statistic.selection) {
+                        updateStatistics(_this.$legend.find("[name=" + statistic.selectionView + "]:checked").val(), null);
+                    } else {
+                        updateStatistics(getLayersByViewId(view.id)[0], null);
+                    }
+                });
+            });
+        }
 
         $signature.append(span);
         $signature.appendTo($container.find(".signatures"));
     });
 
+    if ($container.find("div.key.size").length > 0) {
+        var sizes = [], factor = 0;
+        $container.find("div.key.size").each(function () {
+            sizes.push($(this).data("value"));
+        });
+
+        sizes.sort(function (a, b) {
+            return b - a;
+        });
+        factor = 24 / sizes[0];
+
+        $container.find("div.key.size").each(function () {
+            $(this).children("div").width($(this).data("value") * factor).height($(this).data("value") * factor);
+        });
+    }
+
     this.$legend.append($container);
+    
+    if ($container.find("div.key").length > 0) {
+        $container.find(".signature span").first().click().click();
+    }
 };
 
 Legend.prototype.addViewRadioButtons = function (view) {
@@ -570,6 +639,7 @@ var Statistic = function (options, values) {
     this.absolute = options.absolute;
     this.filterViews = options.filterViews;
     this.selection = options.selection;
+    this.selectionView = options.selectionView;
     this.type = options.type;
     this.view = options.view;
     this.values = values;
@@ -579,13 +649,13 @@ var Statistic = function (options, values) {
     this.filteredValues = {};
     this.filterValue = null;
     this.filterFeature = null;
+    this.filterViewIndex = 0;
 };
 
 Statistic.prototype.constructor = Statistic;
 
 Statistic.prototype.filter = function () {
     var counts = {}, _this = this, key = null;
-
     if (this.filterFeature !== null) {
         key = this.filterFeature.properties[this.selection];
     }
@@ -595,7 +665,7 @@ Statistic.prototype.filter = function () {
             return true;
         }
 
-        if (_this.filterValue !== null && values[2] !== _this.filterValue) {
+        if (_this.filterValue !== null && values[2 + _this.filterViewIndex] !== _this.filterValue) {
             return true;
         }
 
@@ -611,6 +681,16 @@ Statistic.prototype.filter = function () {
     });
 
     this.filteredValues = counts;
+};
+
+Statistic.prototype.setFilterValue = function(value, view) {
+    this.filterValue = value;
+    this.filterViewIndex = this.filterViews.indexOf(view);
+};
+
+Statistic.prototype.unsetFilterValue = function () {
+    this.filterValue = null;
+    this.filterViewIndex = 0;
 };
 
 Statistic.prototype.getSignatureForValue = function (value) {
@@ -636,7 +716,10 @@ Statistic.prototype.getSignatureForValue = function (value) {
 var Info = function () {
     var control = L.control({position: "bottomleft"});
     control.onAdd = function () {
-        return L.DomUtil.create("div", "info");
+        var div = L.DomUtil.create("div", "info");
+        L.DomEvent.disableClickPropagation(div);
+        L.DomEvent.disableScrollPropagation(div);
+        return div;
     };
     control.addTo(map);
 
@@ -678,7 +761,7 @@ Info.prototype.updateLayers = function () {
                 if (clickedLayer !== null) {
                     return true;
                 }
-                
+
                 if (layer.feature.properties[layers[layerId].infoAttribute])
                     _this.$info.append($("<strong>").text(layer.feature.properties[layers[layerId].infoAttribute]));
 
