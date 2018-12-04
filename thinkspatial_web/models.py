@@ -549,13 +549,13 @@ class Question(Base):
         (41, "matrix")
     )
     
-    type = models.PositiveIntegerField(choices=QUESTION_TYPE)
+    type = models.PositiveIntegerField(choices=QUESTION_TYPE, default=None)
     
-    question = models.TextField()  # FIXME: refactor name to "question_text" or something meaningful
+    question = models.TextField(default=None)  # FIXME: refactor name to "question_text" or something meaningful
     
     explanation = models.TextField(null=True)
     
-    attribute = models.ForeignKey(Attribute, on_delete=models.PROTECT)
+    attribute = models.ForeignKey(Attribute, default=None, on_delete=models.PROTECT)
     
     order = models.PositiveIntegerField(default=0)
     
