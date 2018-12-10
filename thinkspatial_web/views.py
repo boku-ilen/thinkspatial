@@ -2,6 +2,7 @@ from PIL import Image
 import datetime
 from django.conf import settings
 from django.contrib.gis.geos import GEOSGeometry
+from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.utils.translation import ugettext as _
@@ -19,10 +20,14 @@ logger = logging.getLogger(__name__)
 def index(request, template=None):
 
     # get the default project if there is no project defined in the session yet
-    project = Project.objects.get(pk=request.session.get("project"))
+    project = None
+    try:
+        project = Project.objects.get(pk=request.session.get("project"))
+    except ObjectDoesNotExist:
+        pass
     if project is None:
         # if there is a django settings variable pointing to a valid project use it if not take the first available
-        if settings.DEFAULT_PROJECT:
+        if hasattr(settings, 'DEFAULT_PROJECT'):
             project = Project.objects.get(pk=settings.DEFAULT_PROJECT)
         if project is None:
             project = Project.objects.first()
