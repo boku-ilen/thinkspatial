@@ -718,5 +718,648 @@
         },
         "model": "thinkspatial_web.signature",
         "pk": 17
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-10-25T06:36:51.731Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 17,
+            "name": "A_Name",
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 624
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:44:39.576Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 24,
+            "name": "M_Name",
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 648
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:39:52.636Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 22,
+            "name": "PCS_Name",
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 643
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:39:21.988Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 21,
+            "name": "L_Name",
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 632
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:37:53.311Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 18,
+            "name": "ISO_Name",
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 630
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-10-23T06:49:23.708Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 15,
+            "name": "Name_E_FK",
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 540
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-07T08:00:13.655Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 25,
+            "name": "border",
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 654
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-07T08:00:13.626Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "geometry_type": 3,
+            "info_attribute": null,
+            "name": "Alpine Convention",
+            "project": 13,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.layer",
+        "pk": 25
+    },
+    {
+        "fields": {
+            "concurrent_views": [],
+            "create_timestamp": "2018-10-09T07:22:57.931Z",
+            "create_user": 1,
+            "default": true,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "legend_order": 0,
+            "legend_tab_order": 4,
+            "name": "Alpine Convention",
+            "signature_type": 4,
+            "update_timestamp": null,
+            "update_user": null,
+            "visibility": 5
+        },
+        "model": "thinkspatial_web.view",
+        "pk": 6
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-10-25T06:36:51.734Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 17,
+            "name": "A_combi",
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 626
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-10-25T06:36:51.700Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "geometry_type": 3,
+            "info_attribute": 624,
+            "name": "Administrative Regions",
+            "project": 13,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.layer",
+        "pk": 17
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:44:39.577Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 24,
+            "name": "M_combi",
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 649
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:44:39.568Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "geometry_type": 7,
+            "info_attribute": 648,
+            "name": "Medium Catchments",
+            "project": 13,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.layer",
+        "pk": 24
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:39:52.639Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 22,
+            "name": "PCS_combi",
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 645
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:39:52.624Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "geometry_type": 3,
+            "info_attribute": 643,
+            "name": "Pilot Case Studies",
+            "project": 13,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.layer",
+        "pk": 22
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:39:21.990Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 21,
+            "name": "L_combi",
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 633
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:39:21.981Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "geometry_type": 3,
+            "info_attribute": 632,
+            "name": "Large Catchments",
+            "project": 13,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.layer",
+        "pk": 21
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:37:53.304Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 18,
+            "name": "ISO",
+            "type": 1,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 627
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-11-05T10:37:53.296Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "geometry_type": 3,
+            "info_attribute": 630,
+            "name": "Countries",
+            "project": 13,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.layer",
+        "pk": 18
+    },
+    {
+        "fields": {
+            "concurrent_views": [],
+            "create_timestamp": "2018-10-17T08:42:31.285Z",
+            "create_user": 1,
+            "default": true,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "legend_order": 1,
+            "legend_tab_order": 3,
+            "name": "Selection Polygons",
+            "signature_type": 12,
+            "update_timestamp": null,
+            "update_user": null,
+            "visibility": 3
+        },
+        "model": "thinkspatial_web.view",
+        "pk": 5
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-10-23T06:49:23.768Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 15,
+            "name": "crit_tsz5",
+            "type": 3,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 567
+    },
+    {
+        "fields": {
+            "concurrent_views": [
+                2
+            ],
+            "create_timestamp": "2018-10-09T07:22:57.931Z",
+            "create_user": 1,
+            "default": false,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "legend_order": 2,
+            "legend_tab_order": 1,
+            "name": "Protection priority",
+            "signature_type": 1,
+            "update_timestamp": null,
+            "update_user": null,
+            "visibility": 1
+        },
+        "model": "thinkspatial_web.view",
+        "pk": 4
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-10-23T06:49:23.713Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 15,
+            "name": "crit_oek",
+            "type": 3,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 541
+    },
+    {
+        "fields": {
+            "concurrent_views": [
+                2
+            ],
+            "create_timestamp": "2018-09-12T06:55:02.316Z",
+            "create_user": 1,
+            "default": true,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "legend_order": 2,
+            "legend_tab_order": 0,
+            "name": "Ecological status",
+            "signature_type": 1,
+            "update_timestamp": null,
+            "update_user": null,
+            "visibility": 2
+        },
+        "model": "thinkspatial_web.view",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-10-23T06:49:23.692Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 15,
+            "name": "MD_class_c",
+            "type": 2,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.attribute",
+        "pk": 532
+    },
+    {
+        "fields": {
+            "create_timestamp": "2018-10-23T06:49:23.662Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "geometry_type": 2,
+            "info_attribute": 540,
+            "name": "River Segments",
+            "project": 13,
+            "update_timestamp": null,
+            "update_user": null
+        },
+        "model": "thinkspatial_web.layer",
+        "pk": 15
+    },
+    {
+        "fields": {
+            "concurrent_views": [
+                3,
+                4
+            ],
+            "create_timestamp": "2018-09-12T06:55:02.316Z",
+            "create_user": 1,
+            "default": false,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "enabled": true,
+            "legend_order": 3,
+            "legend_tab_order": 2,
+            "name": "Catchment size per river unit",
+            "signature_type": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "visibility": 0
+        },
+        "model": "thinkspatial_web.view",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "attribute": 657,
+            "create_timestamp": "2018-11-27T08:42:25.709Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 26,
+            "order": 0,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 9
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 12
+    },
+    {
+        "fields": {
+            "attribute": 656,
+            "create_timestamp": "2018-11-27T08:42:25.709Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 26,
+            "order": 0,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 8
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 11
+    },
+    {
+        "fields": {
+            "attribute": 655,
+            "create_timestamp": "2018-11-27T08:42:25.709Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 26,
+            "order": 0,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 7
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 10
+    },
+    {
+        "fields": {
+            "attribute": 654,
+            "create_timestamp": "2018-11-07T08:03:06.621Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 25,
+            "order": 0,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 6
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 9
+    },
+    {
+        "fields": {
+            "attribute": 626,
+            "create_timestamp": "2018-11-05T08:52:01.039Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 17,
+            "order": 4,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 5
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 4
+    },
+    {
+        "fields": {
+            "attribute": 649,
+            "create_timestamp": "2018-11-05T08:52:01.039Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 24,
+            "order": 3,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 5
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 8
+    },
+    {
+        "fields": {
+            "attribute": 645,
+            "create_timestamp": "2018-11-05T08:52:01.039Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 22,
+            "order": 2,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 5
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 7
+    },
+    {
+        "fields": {
+            "attribute": 633,
+            "create_timestamp": "2018-11-05T08:52:01.039Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 21,
+            "order": 1,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 5
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 6
+    },
+    {
+        "fields": {
+            "attribute": 627,
+            "create_timestamp": "2018-11-05T08:52:01.039Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 18,
+            "order": 0,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 5
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 5
+    },
+    {
+        "fields": {
+            "attribute": 567,
+            "create_timestamp": "2018-11-05T08:52:01.039Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 15,
+            "order": 0,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 4
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 3
+    },
+    {
+        "fields": {
+            "attribute": 541,
+            "create_timestamp": "2018-11-05T08:52:01.039Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 15,
+            "order": 0,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 3
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 2
+    },
+    {
+        "fields": {
+            "attribute": 532,
+            "create_timestamp": "2018-11-05T08:52:01.039Z",
+            "create_user": 1,
+            "delete_timestamp": null,
+            "delete_user": null,
+            "layer": 15,
+            "order": 0,
+            "update_timestamp": null,
+            "update_user": null,
+            "view": 2
+        },
+        "model": "thinkspatial_web.view_layer",
+        "pk": 1
     }
 ]
