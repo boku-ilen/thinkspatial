@@ -18,9 +18,13 @@ ALLOWED_HOSTS = []
 # Database settings
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'NAME': 'thinkspatial',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'USER': 'thinkspatial',
+        'PASSWORD': '***',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    },
 }
 
 # Internationalization
@@ -29,12 +33,6 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
-
-# prefix for URL references where the project is not deployed at a root node (eg. /thinkspatial)
-ROOT_URL = '/'
-
-# set the default template style if applicable
-DEFAULT_TEMPLATE = 'old'
 
 # set the default project to be displayed
 DEFAULT_PROJECT = 10
